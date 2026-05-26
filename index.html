@@ -7,13 +7,17 @@
   <style>
     :root {
       --ink: #fff9ff;
-      --muted: rgba(255, 245, 252, 0.82);
-      --panel: rgba(255, 255, 255, 0.1);
-      --line: rgba(255, 214, 127, 0.32);
-      --pink: #ff89d7;
+      --muted: rgba(246, 252, 255, 0.84);
+      --panel: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 226, 112, 0.36);
+      --pink: #ff8bc9;
       --cyan: #83f3ff;
-      --mint: #b08bff;
-      --gold: #ffd27f;
+      --mint: #80ffbb;
+      --gold: #ffe56f;
+      --lemon: #fff36a;
+      --sky: #6ce6ff;
+      --leaf: #8cffb6;
+      --violet: #9a8bff;
       --cube: clamp(190px, 31vw, 330px);
       --half: calc(var(--cube) / 2);
       --net: calc(var(--cube) * 1.08);
@@ -34,9 +38,10 @@
       color: var(--ink);
       font-family: "Trebuchet MS", "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 20% 20%, #33135e 0%, transparent 45%),
-        radial-gradient(circle at 80% 80%, #0b4563 0%, transparent 45%),
-        linear-gradient(135deg, #0b0618, #2a0f33 45%, #0f2d4a);
+        radial-gradient(circle at 16% 12%, rgba(255,243,106,0.26) 0%, transparent 34%),
+        radial-gradient(circle at 80% 18%, rgba(108,230,255,0.24) 0%, transparent 40%),
+        radial-gradient(circle at 53% 84%, rgba(140,255,182,0.16) 0%, transparent 42%),
+        linear-gradient(135deg, #081225, #16284b 42%, #0b3a4b 72%, #2d2352);
     }
 
     .app {
@@ -72,8 +77,22 @@
         radial-gradient(circle at 86% 78%, rgba(255,137,215,0.38) 0 1px, transparent 1.8px);
       background-size: 13rem 13rem, 15rem 15rem, auto, auto, auto, auto;
       mix-blend-mode: screen;
-      opacity: 0.52;
-      animation: skyShift 12s ease-in-out infinite alternate;
+      opacity: 0.58;
+      animation: skyShift 15s ease-in-out infinite alternate;
+    }
+
+    .app::after {
+      content: "";
+      position: absolute;
+      inset: -22%;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        conic-gradient(from 90deg at 50% 50%, transparent, rgba(255,243,106,0.11), transparent, rgba(108,230,255,0.13), transparent),
+        radial-gradient(circle at 50% 50%, transparent 0 28%, rgba(255,255,255,0.08) 29%, transparent 31%);
+      mix-blend-mode: screen;
+      opacity: 0.62;
+      animation: twinAura 18s linear infinite;
     }
 
     .hud {
@@ -81,8 +100,23 @@
       left: clamp(1rem, 4vw, 3rem);
       top: clamp(1rem, 4vw, 3rem);
       z-index: 5;
-      width: min(25rem, calc(100vw - 2rem));
+      width: min(30rem, calc(100vw - 2rem));
       pointer-events: none;
+      animation: hudIntro 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .hud::before {
+      content: "♊";
+      position: absolute;
+      right: 0.2rem;
+      top: -1.3rem;
+      z-index: -1;
+      color: rgba(255,255,255,0.1);
+      font-family: Georgia, serif;
+      font-size: clamp(5rem, 14vw, 9rem);
+      line-height: 1;
+      text-shadow: 0 0 34px rgba(255,229,111,0.28);
+      animation: glyphBreathe 4.8s ease-in-out infinite;
     }
 
     .eyebrow {
@@ -93,13 +127,13 @@
       padding: 0.45rem 0.8rem;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255,255,255,0.44);
+      background: rgba(8,18,37,0.38);
       backdrop-filter: blur(16px);
       color: var(--muted);
       font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      box-shadow: 0 12px 28px rgba(93,113,148,0.1);
+      box-shadow: 0 12px 28px rgba(93,113,148,0.18);
     }
 
     .eyebrow::before,
@@ -117,7 +151,13 @@
       margin: 1rem 0 0;
       font-size: clamp(2.2rem, 5vw, 4.8rem);
       line-height: 0.96;
-      letter-spacing: 0;
+      letter-spacing: -0.05em;
+      text-wrap: balance;
+      background: linear-gradient(120deg, #fff, var(--lemon) 32%, var(--sky) 66%, #fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.28));
     }
 
     .copy {
@@ -128,6 +168,172 @@
       line-height: 1.72;
     }
 
+    .trait-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.52rem;
+      max-width: 28rem;
+      margin-top: 1rem;
+    }
+
+    .trait {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2rem;
+      padding: 0.38rem 0.72rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      background:
+        linear-gradient(135deg, rgba(255,243,106,0.2), rgba(108,230,255,0.12)),
+        rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.88);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 12px 26px rgba(0,0,0,0.12);
+      backdrop-filter: blur(14px);
+      animation: traitDrift 5.4s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .trait:nth-child(2) { --delay: 0.35s; }
+    .trait:nth-child(3) { --delay: 0.7s; }
+    .trait:nth-child(4) { --delay: 1.05s; }
+    .trait:nth-child(5) { --delay: 1.4s; }
+
+    .gemini-orbit {
+      position: absolute;
+      right: clamp(1rem, 4vw, 3.2rem);
+      top: clamp(1rem, 5vw, 4rem);
+      z-index: 5;
+      width: min(18.5rem, 32vw);
+      min-height: 13.5rem;
+      pointer-events: none;
+      animation: hudIntro 1100ms 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      inset: 1rem 0.5rem 0.5rem;
+      border: 1px solid rgba(255,243,106,0.28);
+      border-radius: 48% 52% 50% 50%;
+      transform: rotate(-14deg);
+      box-shadow:
+        0 0 34px rgba(108,230,255,0.12),
+        inset 0 0 24px rgba(255,255,255,0.06);
+      animation: orbitSkew 9s ease-in-out infinite;
+    }
+
+    .mercury-dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0.72rem;
+      height: 0.72rem;
+      margin: -0.36rem 0 0 -0.36rem;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 20px rgba(255,229,111,0.78);
+      transform-origin: 0 0;
+      animation: mercuryRun 5.8s linear infinite;
+    }
+
+    .twin-card {
+      position: absolute;
+      width: 8.4rem;
+      padding: 0.7rem 0.78rem;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 1.25rem;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.06)),
+        rgba(12,27,49,0.34);
+      box-shadow: 0 18px 42px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.22);
+      backdrop-filter: blur(16px);
+    }
+
+    .twin-card::before {
+      content: "";
+      display: block;
+      width: 0.52rem;
+      height: 0.52rem;
+      margin-bottom: 0.45rem;
+      border-radius: 50%;
+      background: var(--sky);
+      box-shadow: 0 0 18px rgba(108,230,255,0.72);
+    }
+
+    .twin-card strong,
+    .twin-card span {
+      display: block;
+    }
+
+    .twin-card strong {
+      color: #fff;
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .twin-card span {
+      margin-top: 0.2rem;
+      color: rgba(246,252,255,0.76);
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .twin-card.castor {
+      left: 0;
+      top: 2rem;
+      animation: twinFloatA 5.4s ease-in-out infinite;
+    }
+
+    .twin-card.pollux {
+      right: 0;
+      bottom: 0.6rem;
+      animation: twinFloatB 5.4s 0.3s ease-in-out infinite;
+    }
+
+    .twin-card.pollux::before {
+      background: var(--leaf);
+      box-shadow: 0 0 18px rgba(140,255,182,0.72);
+    }
+
+    .air-notes {
+      position: absolute;
+      right: clamp(1rem, 4vw, 3rem);
+      bottom: calc(clamp(1rem, 4vw, 2rem) + 6.5rem);
+      z-index: 5;
+      display: grid;
+      gap: 0.55rem;
+      width: min(18rem, 34vw);
+      pointer-events: none;
+    }
+
+    .air-note {
+      position: relative;
+      justify-self: end;
+      max-width: 100%;
+      padding: 0.62rem 0.82rem;
+      border: 1px solid rgba(255,255,255,0.19);
+      border-radius: 1rem 1rem 0.18rem 1rem;
+      background: rgba(10,26,48,0.32);
+      color: rgba(255,255,255,0.82);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.2);
+      backdrop-filter: blur(16px);
+      animation: noteFloat 6s ease-in-out infinite;
+    }
+
+    .air-note:nth-child(2) {
+      justify-self: start;
+      border-radius: 1rem 1rem 1rem 0.18rem;
+      animation-delay: 0.65s;
+    }
+
+    .air-note:nth-child(3) {
+      animation-delay: 1.3s;
+    }
+
     .stage {
       position: absolute;
       inset: 0;
@@ -136,6 +342,24 @@
       place-items: center;
       perspective: 1300px;
       transform-style: preserve-3d;
+    }
+
+    .stage::before {
+      content: "Ⅱ";
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      z-index: 0;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.07);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(18rem, 42vw, 34rem);
+      line-height: 0.8;
+      letter-spacing: -0.16em;
+      text-shadow:
+        0 0 40px rgba(255,229,111,0.22),
+        0 0 90px rgba(108,230,255,0.18);
+      animation: twinGate 10s ease-in-out infinite;
     }
 
     .stage::after {
@@ -157,9 +381,35 @@
       z-index: 2;
       width: min(64vw, 360px);
       aspect-ratio: 1;
+      isolation: isolate;
       transform-style: preserve-3d;
       transition: opacity 760ms ease, transform 1100ms cubic-bezier(0.2, 0.86, 0.18, 1);
       animation: cardFloat 4.8s ease-in-out infinite;
+    }
+
+    .carousel::before,
+    .carousel::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      z-index: -1;
+      border-radius: 38% 62% 48% 52%;
+      pointer-events: none;
+    }
+
+    .carousel::before {
+      border: 1px solid rgba(255,229,111,0.24);
+      box-shadow: 0 0 34px rgba(255,229,111,0.1);
+      transform: rotate(12deg);
+      animation: orbitSkew 8.2s ease-in-out infinite;
+    }
+
+    .carousel::after {
+      inset: -13%;
+      border: 1px solid rgba(108,230,255,0.2);
+      border-radius: 58% 42% 50% 50%;
+      transform: rotate(-20deg);
+      animation: orbitSkew 8.2s 0.6s ease-in-out infinite reverse;
     }
 
     .slide {
@@ -176,20 +426,28 @@
         0 0 42px rgba(131,243,255,0.13),
         inset 0 1px 0 rgba(255,255,255,0.32);
       opacity: 0;
-      transform: translateX(20%) rotateY(18deg) scale(0.92);
-      transition: opacity 420ms ease, transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform: translateX(26%) rotateY(22deg) rotateZ(3deg) scale(0.88);
+      transition: opacity 460ms ease, filter 460ms ease, transform 760ms cubic-bezier(0.16, 1, 0.3, 1);
       backface-visibility: hidden;
+      filter: saturate(0.88) blur(1px);
     }
 
     .slide.active {
       opacity: 1;
       transform: translateX(0) rotateY(0deg) scale(1);
       z-index: 2;
+      filter: saturate(1.08) blur(0);
     }
 
     .slide.previous {
       opacity: 0;
-      transform: translateX(-20%) rotateY(-18deg) scale(0.92);
+      transform: translateX(-26%) rotateY(-22deg) rotateZ(-3deg) scale(0.88);
+      z-index: 1;
+    }
+
+    .slide.next {
+      opacity: 0;
+      transform: translateX(28%) rotateY(24deg) rotateZ(4deg) scale(0.88);
       z-index: 1;
     }
 
@@ -211,6 +469,28 @@
         linear-gradient(135deg, rgba(255,255,255,0.34), transparent 32%, transparent 68%, rgba(255,255,255,0.15)),
         linear-gradient(180deg, transparent 52%, rgba(16,24,42,0.28));
       mix-blend-mode: screen;
+    }
+
+    .slide::before,
+    .face::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.42), transparent 58%);
+      mix-blend-mode: screen;
+      opacity: 0;
+      transform: translateX(-42%) rotate(10deg);
+    }
+
+    .slide.active::before {
+      animation: mirrorSweep 980ms ease both;
+    }
+
+    .face::before {
+      animation: faceGlow 5.8s ease-in-out infinite;
+      animation-delay: var(--delay, 0ms);
     }
 
     .slide figcaption,
@@ -247,13 +527,25 @@
       transition: opacity 620ms ease;
     }
 
+    .cube-scene::after {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      z-index: -1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,229,111,0.16), rgba(108,230,255,0.1) 32%, transparent 68%);
+      filter: blur(20px);
+      opacity: 0;
+      transition: opacity 800ms ease;
+    }
+
     .cube {
       position: relative;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
       transform: rotateX(-8deg) rotateY(-18deg) scale(0.62);
-      transition: transform 1.85s cubic-bezier(0.18, 0.92, 0.2, 1);
+      transition: transform 1.95s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .face {
@@ -320,6 +612,10 @@
       opacity: 1;
     }
 
+    .app.is-assembling .cube-scene::after {
+      opacity: 1;
+    }
+
     .app.is-assembling .face {
       opacity: 1;
       filter: saturate(1.08) brightness(1.04);
@@ -345,8 +641,7 @@
       transform: translate3d(0, calc(var(--net) * -2), 22px) rotateZ(4deg) scale(0.96);
     }
 
-    .app.is-assembling .fac
-    e.bottom {
+    .app.is-assembling .face.bottom {
       transform: translate3d(0, var(--net), 28px) rotateZ(-4deg) scale(0.96);
     }
 
@@ -379,7 +674,7 @@
     }
 
     .app.is-spinning .cube {
-      animation: cubeSpin 24s linear infinite;
+      animation: cubeSpin 21s cubic-bezier(0.45, 0, 0.55, 1) infinite;
     }
 
     .app.is-spinning .face {
@@ -411,12 +706,14 @@
       border-radius: 999px;
       background: rgba(255,255,255,0.42);
       transition: width 240ms ease, background 240ms ease, box-shadow 240ms ease;
+      animation: dotPulse 3.4s ease-in-out infinite;
     }
 
     .progress span.active {
       width: 1.4rem;
       background: linear-gradient(135deg, var(--pink), var(--cyan));
       box-shadow: 0 0 16px rgba(99,217,246,0.68);
+      animation-duration: 1.5s;
     }
 
     .status {
@@ -449,6 +746,7 @@
       background: linear-gradient(135deg, var(--pink), var(--cyan));
       box-shadow: 0 0 18px rgba(99,217,246,0.72);
       flex: 0 0 auto;
+      animation: statusPulse 1.8s ease-in-out infinite;
     }
 
     .status strong {
@@ -456,23 +754,134 @@
     }
 
     @keyframes skyShift {
-      from { transform: translate3d(0, 0, 0); }
-      to { transform: translate3d(0.7rem, -0.5rem, 0); }
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(0.9rem, -0.7rem, 0) scale(1.02); }
+    }
+
+    @keyframes twinAura {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(360deg) scale(1.04); }
+    }
+
+    @keyframes hudIntro {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes glyphBreathe {
+      0%, 100% {
+        transform: translateY(0) rotate(-2deg) scale(1);
+        opacity: 0.72;
+      }
+      50% {
+        transform: translateY(8px) rotate(2deg) scale(1.04);
+        opacity: 1;
+      }
+    }
+
+    @keyframes traitDrift {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes orbitSkew {
+      0%, 100% { transform: rotate(-14deg) scale(1); }
+      50% { transform: rotate(-6deg) scale(1.05); }
+    }
+
+    @keyframes mercuryRun {
+      from { transform: rotate(0deg) translateX(8.1rem) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(8.1rem) rotate(-360deg); }
+    }
+
+    @keyframes twinFloatA {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(-4deg); }
+      50% { transform: translate3d(0.55rem, -0.8rem, 0) rotate(2deg); }
+    }
+
+    @keyframes twinFloatB {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(5deg); }
+      50% { transform: translate3d(-0.55rem, 0.7rem, 0) rotate(-2deg); }
+    }
+
+    @keyframes noteFloat {
+      0%, 100% {
+        opacity: 0.76;
+        transform: translate3d(0, 0, 0);
+      }
+      50% {
+        opacity: 1;
+        transform: translate3d(-0.42rem, -0.5rem, 0);
+      }
+    }
+
+    @keyframes twinGate {
+      0%, 100% {
+        transform: translate(-50%, -50%) scaleX(0.96) rotate(0deg);
+        opacity: 0.78;
+      }
+      50% {
+        transform: translate(-50%, -50%) scaleX(1.04) rotate(1deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes mirrorSweep {
+      0% {
+        opacity: 0;
+        transform: translateX(-48%) rotate(10deg);
+      }
+      35% {
+        opacity: 0.95;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(48%) rotate(10deg);
+      }
+    }
+
+    @keyframes faceGlow {
+      0%, 100% {
+        opacity: 0;
+        transform: translateX(-40%) rotate(10deg);
+      }
+      42%, 60% {
+        opacity: 0.34;
+      }
+      100% {
+        transform: translateX(40%) rotate(10deg);
+      }
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.45); }
     }
 
     @keyframes cardFloat {
-      0%, 100% { transform: translateY(0) rotateX(0deg); }
-      50% { transform: translateY(-10px) rotateX(2deg); }
+      0%, 100% { transform: translateY(0) rotateX(0deg) rotateZ(-0.5deg); }
+      50% { transform: translateY(-13px) rotateX(2.5deg) rotateZ(0.7deg); }
     }
 
     @keyframes cubeSpin {
-      0% { transform: rotateX(-23deg) rotateY(-34deg) scale(1); }
-      16.6% { transform: rotateX(-18deg) rotateY(-96deg) scale(1); }
-      33.3% { transform: rotateX(-22deg) rotateY(-182deg) scale(1); }
-      50% { transform: rotateX(-18deg) rotateY(-276deg) scale(1); }
-      66.6% { transform: rotateX(-84deg) rotateY(-336deg) scale(1); }
-      83.3% { transform: rotateX(72deg) rotateY(-390deg) scale(1); }
-      100% { transform: rotateX(-23deg) rotateY(-394deg) scale(1); }
+      0% { transform: rotateX(-23deg) rotateY(-34deg) rotateZ(0deg) scale(1); }
+      16.6% { transform: rotateX(-18deg) rotateY(-96deg) rotateZ(1deg) scale(1.01); }
+      33.3% { transform: rotateX(-22deg) rotateY(-182deg) rotateZ(-1deg) scale(1); }
+      50% { transform: rotateX(-18deg) rotateY(-276deg) rotateZ(1deg) scale(1.015); }
+      66.6% { transform: rotateX(-84deg) rotateY(-336deg) rotateZ(-0.5deg) scale(1); }
+      83.3% { transform: rotateX(72deg) rotateY(-390deg) rotateZ(0.5deg) scale(1.01); }
+      100% { transform: rotateX(-23deg) rotateY(-394deg) rotateZ(0deg) scale(1); }
     }
 
     @media (max-width: 720px) {
@@ -503,9 +912,58 @@
         width: min(74vw, 310px);
       }
 
+      .gemini-orbit {
+        right: 0.65rem;
+        top: 10rem;
+        width: 9.6rem;
+        min-height: 8.2rem;
+        opacity: 0.72;
+      }
+
+      .orbit-ring {
+        inset: 0.7rem 0.2rem 0.3rem;
+      }
+
+      .mercury-dot {
+        animation-name: mercuryRunMobile;
+      }
+
+      .twin-card {
+        width: 5.8rem;
+        padding: 0.54rem 0.58rem;
+        border-radius: 0.95rem;
+      }
+
+      .twin-card strong {
+        font-size: 0.68rem;
+      }
+
+      .twin-card span {
+        font-size: 0.62rem;
+      }
+
+      .air-notes {
+        display: none;
+      }
+
+      .trait-cloud {
+        max-width: 18rem;
+      }
+
+      .trait {
+        min-height: 1.8rem;
+        padding: 0.32rem 0.58rem;
+        font-size: 0.72rem;
+      }
+
       .status {
         font-size: 0.84rem;
       }
+    }
+
+    @keyframes mercuryRunMobile {
+      from { transform: rotate(0deg) translateX(4.2rem) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(4.2rem) rotate(-360deg); }
     }
   </style>
 </head>
@@ -513,31 +971,63 @@
   <main class="app" id="app">
     <canvas class="gemini-canvas" id="geminiCanvas" aria-hidden="true"></canvas>
 
+    <header class="hud" aria-label="双子座主题说明">
+      <div class="eyebrow">Gemini / Air Sign / Mercury</div>
+      <h1>双子灵感相册</h1>
+      <p class="copy">把好奇、聊天、双生镜像和风一样的变化感放进照片里：轻快、明亮、会转弯，也会突然发光。</p>
+      <div class="trait-cloud" aria-label="双子座关键词">
+        <span class="trait">好奇心</span>
+        <span class="trait">交流感</span>
+        <span class="trait">双生镜像</span>
+        <span class="trait">风象流动</span>
+        <span class="trait">明亮跳色</span>
+      </div>
+    </header>
+
+    <aside class="gemini-orbit" aria-hidden="true">
+      <div class="orbit-ring"></div>
+      <div class="mercury-dot"></div>
+      <div class="twin-card castor">
+        <strong>Castor</strong>
+        <span>灵感跳跃，像一句刚冒出来的好问题。</span>
+      </div>
+      <div class="twin-card pollux">
+        <strong>Pollux</strong>
+        <span>把故事接住，再换个角度重新发光。</span>
+      </div>
+    </aside>
+
+    <aside class="air-notes" aria-hidden="true">
+      <span class="air-note">“今天想拍点不一样的。”</span>
+      <span class="air-note">“换个视角，再来一面。”</span>
+      <span class="air-note">“好奇心正在加载...”</span>
+    </aside>
+
     <section class="stage" aria-label="图片立方体动画">
       <div class="carousel" id="carousel">
         <figure class="slide active">
           <img src="./001.png" alt="轮播图片 1">
-          <figcaption>Photo 01</figcaption>
+          <figcaption>Curiosity</figcaption>
         </figure>
         <figure class="slide">
           <img src="./002.png" alt="轮播图片 2">
-          <figcaption>Photo 02</figcaption>
+          <figcaption>Dialogue</figcaption>
         </figure>
         <figure class="slide">
           <img src="./003.png" alt="轮播图片 3">
-          <figcaption>Photo 03</figcaption>
+          <figcaption>Mirror</figcaption>
         </figure>
         <figure class="slide">
           <img src="./004.png" alt="轮播图片 4">
-          <figcaption>Photo 04</figcaption>
+          <figcaption>Air Flow</figcaption>
         </figure>
         <figure class="slide">
           <img src="./005.png" alt="轮播图片 5">
-          <figcaption>Photo 05</figcaption>
+          <figcaption>Mercury</figcaption>
         </figure>
         <figure class="slide">
           <img src="./006.png" alt="轮播图片 6">
-          <figcaption>Photo 06</figcaption>
+          <figcaption>Twin Spark</figcaption>
         </figure>
       </div>
 
@@ -545,27 +1035,27 @@
         <div class="cube" id="cube">
           <figure class="face front">
             <img src="./001.png" alt="立方体正面">
-            <figcaption>Face 01</figcaption>
+            <figcaption>Curiosity</figcaption>
           </figure>
           <figure class="face right">
             <img src="./002.png" alt="立方体右面">
-            <figcaption>Face 02</figcaption>
+            <figcaption>Dialogue</figcaption>
           </figure>
           <figure class="face back">
             <img src="./003.png" alt="立方体背面">
-            <figcaption>Face 03</figcaption>
+            <figcaption>Mirror</figcaption>
           </figure>
           <figure class="face left">
             <img src="./004.png" alt="立方体左面">
-            <figcaption>Face 04</figcaption>
+            <figcaption>Air Flow</figcaption>
           </figure>
           <figure class="face top">
             <img src="./005.png" alt="立方体顶面">
-            <figcaption>Face 05</figcaption>
+            <figcaption>Mercury</figcaption>
           </figure>
           <figure class="face bottom">
             <img src="./006.png" alt="立方体底面">
-            <figcaption>Face 06</figcaption>
+            <figcaption>Twin Spark</figcaption>
           </figure>
         </div>
       </div>
@@ -582,7 +1072,7 @@
 
     <div class="status">
       <i aria-hidden="true"></i>
-      <span><span id="phase">图片轮播</span> <strong id="current">Photo 01</strong></span>
+      <span><span id="phase">双子灵感轮播</span> <strong id="current">Curiosity</strong></span>
     </div>
   </main>
 
@@ -594,8 +1084,9 @@
     const dots = Array.from(document.querySelectorAll("#progress span"));
     const phase = document.getElementById("phase");
     const current = document.getElementById("current");
-    const slideDuration = 980;
-    const spinFaces = ["Face 01", "Face 02", "Face 03", "Face 04", "Face 05", "Face 06"];
+    const slideDuration = 1120;
+    const geminiThemes = ["Curiosity", "Dialogue", "Mirror", "Air Flow", "Mercury", "Twin Spark"];
+    const geminiNotes = ["多问一句", "说给风听", "双面同频", "轻快转场", "水星快讯", "灵感闪烁"];
     let currentSlide = 0;
     let bgWidth = 0;
     let bgHeight = 0;
@@ -605,6 +1096,8 @@
     const dust = [];
     const ribbons = [];
     const bursts = [];
+    const chatBubbles = [];
+    const comets = [];
 
     function rand(min, max) {
       return Math.random() * (max - min) + min;
@@ -626,10 +1119,14 @@
       stars.length = 0;
       dust.length = 0;
       ribbons.length = 0;
+      chatBubbles.length = 0;
+      comets.length = 0;
 
       const starCount = Math.floor((bgWidth * bgHeight) / 6500);
       const dustCount = Math.floor((bgWidth * bgHeight) / 9000);
-      const ribbonCount = Math.max(5, Math.floor(bgWidth / 300));
+      const ribbonCount = Math.max(6, Math.floor(bgWidth / 280));
+      const bubbleCount = bgWidth < 720 ? 4 : 7;
+      const cometCount = bgWidth < 720 ? 3 : 5;
 
       for (let i = 0; i < starCount; i += 1) {
         stars.push({
@@ -637,7 +1134,8 @@
           y: rand(0, bgHeight),
           r: rand(0.6, 2.2),
           twinkle: rand(0.3, 1.4),
-          phase: rand(0, Math.PI * 2)
+          phase: rand(0, Math.PI * 2),
+          drift: rand(0.05, 0.28)
         });
       }
 
@@ -656,9 +1154,32 @@
         ribbons.push({
           y: rand(bgHeight * 0.18, bgHeight * 0.86),
           amp: rand(16, 42),
-          speed: rand(0.2, 0.75),
+          speed: rand(0.26, 0.86),
           thick: rand(1.2, 3.8),
-          hue: rand(180, 300),
+          hue: rand(55, 190),
+          phase: rand(0, Math.PI * 2)
+        });
+      }
+
+      for (let i = 0; i < bubbleCount; i += 1) {
+        chatBubbles.push({
+          x: rand(bgWidth * 0.08, bgWidth * 0.92),
+          y: rand(bgHeight * 0.16, bgHeight * 0.86),
+          w: rand(46, 96),
+          h: rand(22, 38),
+          speed: rand(0.12, 0.38),
+          phase: rand(0, Math.PI * 2),
+          hue: rand(58, 190)
+        });
+      }
+
+      for (let i = 0; i < cometCount; i += 1) {
+        comets.push({
+          x: rand(-bgWidth * 0.4, bgWidth),
+          y: rand(bgHeight * 0.08, bgHeight * 0.72),
+          speed: rand(0.9, 1.9),
+          length: rand(70, 150),
+          hue: i % 2 === 0 ? rand(50, 70) : rand(170, 195),
           phase: rand(0, Math.PI * 2)
         });
       }
@@ -668,8 +1189,10 @@
       bgTime += 0.016;
       bgCtx.clearRect(0, 0, bgWidth, bgHeight);
       drawHappyDayWash();
+      drawComets(bgTime);
       drawStars(bgTime);
       drawRibbons(bgTime);
+      drawChatBubbles(bgTime);
       drawDust();
       drawGeminiCore(bgTime);
       drawGeminiSymbol(bgTime);
@@ -689,11 +1212,38 @@
     function drawStars(now) {
       for (const star of stars) {
         const glow = 0.4 + 0.6 * Math.sin(now * star.twinkle + star.phase);
+        star.x += star.drift * 0.08;
+        if (star.x > bgWidth + 4) star.x = -4;
         bgCtx.beginPath();
         bgCtx.fillStyle = `rgba(255,255,255,${0.22 + glow * 0.7})`;
         bgCtx.arc(star.x, star.y, star.r + glow * 0.8, 0, Math.PI * 2);
         bgCtx.fill();
       }
+    }
+
+    function drawComets(now) {
+      for (const comet of comets) {
+        comet.x += comet.speed;
+        comet.y += Math.sin(now * 0.8 + comet.phase) * 0.18;
+        if (comet.x - comet.length > bgWidth + 20) {
+          comet.x = rand(-bgWidth * 0.45, -80);
+          comet.y = rand(bgHeight * 0.08, bgHeight * 0.72);
+        }
+
+        const gradient = bgCtx.createLinearGradient(comet.x - comet.length, comet.y - 16, comet.x, comet.y);
+        gradient.addColorStop(0, `hsla(${comet.hue},95%,72%,0)`);
+        gradient.addColorStop(0.7, `hsla(${comet.hue},95%,72%,0.22)`);
+        gradient.addColorStop(1, `hsla(${comet.hue},95%,82%,0.78)`);
+        bgCtx.beginPath();
+        bgCtx.strokeStyle = gradient;
+        bgCtx.lineWidth = 2;
+        bgCtx.shadowColor = `hsla(${comet.hue},95%,72%,0.48)`;
+        bgCtx.shadowBlur = 16;
+        bgCtx.moveTo(comet.x - comet.length, comet.y - 16);
+        bgCtx.lineTo(comet.x, comet.y);
+        bgCtx.stroke();
+      }
+      bgCtx.shadowBlur = 0;
     }
 
     function drawRibbons(now) {
@@ -715,6 +1265,54 @@
         bgCtx.stroke();
       }
       bgCtx.shadowBlur = 0;
+    }
+
+    function drawChatBubbles(now) {
+      for (const bubble of chatBubbles) {
+        const floatX = Math.sin(now * bubble.speed + bubble.phase) * 13;
+        const floatY = Math.cos(now * bubble.speed * 1.4 + bubble.phase) * 9;
+        const x = bubble.x + floatX;
+        const y = bubble.y + floatY;
+        const alpha = 0.16 + Math.sin(now * bubble.speed * 2 + bubble.phase) * 0.05;
+
+        bgCtx.save();
+        bgCtx.translate(x, y);
+        bgCtx.beginPath();
+        roundedRect(bgCtx, -bubble.w / 2, -bubble.h / 2, bubble.w, bubble.h, 12);
+        bgCtx.fillStyle = `hsla(${bubble.hue},90%,76%,${alpha})`;
+        bgCtx.shadowColor = `hsla(${bubble.hue},90%,76%,0.26)`;
+        bgCtx.shadowBlur = 18;
+        bgCtx.fill();
+        bgCtx.beginPath();
+        bgCtx.moveTo(bubble.w * 0.18, bubble.h * 0.42);
+        bgCtx.lineTo(bubble.w * 0.32, bubble.h * 0.66);
+        bgCtx.lineTo(bubble.w * 0.07, bubble.h * 0.48);
+        bgCtx.closePath();
+        bgCtx.fill();
+
+        bgCtx.shadowBlur = 0;
+        bgCtx.fillStyle = `rgba(255,255,255,${0.34 + alpha})`;
+        for (let i = -1; i <= 1; i += 1) {
+          bgCtx.beginPath();
+          bgCtx.arc(i * 10, 0, 2, 0, Math.PI * 2);
+          bgCtx.fill();
+        }
+        bgCtx.restore();
+      }
+    }
+
+    function roundedRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
     }
 
     function drawDust() {
@@ -745,8 +1343,8 @@
 
       const beam = bgCtx.createLinearGradient(ax, ay, bx, by);
       beam.addColorStop(0, "rgba(131,243,255,0.88)");
-      beam.addColorStop(0.5, "rgba(255,255,255,0.78)");
-      beam.addColorStop(1, "rgba(255,137,215,0.88)");
+      beam.addColorStop(0.5, "rgba(255,243,106,0.78)");
+      beam.addColorStop(1, "rgba(140,255,182,0.88)");
       bgCtx.strokeStyle = beam;
       bgCtx.lineWidth = Math.max(2, Math.min(bgWidth, bgHeight) * 0.0045);
       bgCtx.shadowColor = "rgba(170,220,255,0.75)";
@@ -758,9 +1356,34 @@
 
       const pulse = 11 + Math.sin(now * 2.7) * 3;
       drawNeonPlanet(ax, ay, pulse, "rgba(131,243,255,0.78)");
-      drawNeonPlanet(bx, by, pulse, "rgba(255,137,215,0.78)");
+      drawNeonPlanet(bx, by, pulse, "rgba(140,255,182,0.78)");
+      drawMercuryOrbit(cx, cy, orbit * 1.55, now);
       drawConstellation(ax, ay, bx, by, now);
       bgCtx.shadowBlur = 0;
+    }
+
+    function drawMercuryOrbit(cx, cy, radius, now) {
+      bgCtx.save();
+      bgCtx.translate(cx, cy);
+      bgCtx.rotate(-0.28);
+      bgCtx.scale(1, 0.42);
+      bgCtx.beginPath();
+      bgCtx.strokeStyle = "rgba(255,229,111,0.26)";
+      bgCtx.lineWidth = 1.3;
+      bgCtx.setLineDash([6, 12]);
+      bgCtx.arc(0, 0, radius, 0, Math.PI * 2);
+      bgCtx.stroke();
+      bgCtx.setLineDash([]);
+
+      const dotX = Math.cos(now * 1.8) * radius;
+      const dotY = Math.sin(now * 1.8) * radius;
+      bgCtx.beginPath();
+      bgCtx.fillStyle = "rgba(255,229,111,0.92)";
+      bgCtx.shadowColor = "rgba(255,229,111,0.72)";
+      bgCtx.shadowBlur = 18;
+      bgCtx.arc(dotX, dotY, 4.2, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.restore();
     }
 
     function drawNeonPlanet(x, y, radius, color) {
@@ -819,9 +1442,9 @@
 
       bgCtx.save();
       bgCtx.translate(x, y + sway);
-      bgCtx.strokeStyle = "rgba(255,214,127,0.82)";
+      bgCtx.strokeStyle = "rgba(255,229,111,0.86)";
       bgCtx.lineWidth = Math.max(2, size * 0.12);
-      bgCtx.shadowColor = "rgba(255,214,127,0.62)";
+      bgCtx.shadowColor = "rgba(255,229,111,0.62)";
       bgCtx.shadowBlur = 16;
       bgCtx.lineCap = "round";
       bgCtx.beginPath();
@@ -850,7 +1473,7 @@
           vy: Math.sin(angle) * speed,
           life,
           maxLife: life,
-          hue: rand(180, 340),
+          hue: Math.random() > 0.46 ? rand(50, 75) : rand(165, 195),
           r: rand(1.2, 3.2)
         });
       }
@@ -888,10 +1511,11 @@
       slides.forEach((slide, slideIndex) => {
         slide.classList.toggle("active", slideIndex === index);
         slide.classList.toggle("previous", slideIndex === index - 1);
+        slide.classList.toggle("next", slideIndex === index + 1);
       });
 
-      phase.textContent = "图片轮播";
-      current.textContent = "Photo " + String(index + 1).padStart(2, "0");
+      phase.textContent = "双子灵感轮播";
+      current.textContent = geminiThemes[index] + " / " + geminiNotes[index];
       setProgress(index);
     }
 
@@ -909,8 +1533,8 @@
 
     function startAssembling() {
       app.classList.add("is-assembling");
-      phase.textContent = "正在拼成立方体";
-      current.textContent = "六面合成";
+      phase.textContent = "双生画面展开";
+      current.textContent = "六面正在对话";
       dots.forEach((dot) => dot.classList.add("active"));
 
       window.setTimeout(() => {
@@ -923,12 +1547,12 @@
     function startSpinning() {
       let faceIndex = 0;
       app.classList.add("is-spinning");
-      phase.textContent = "立方体旋转";
+      phase.textContent = "水星轨道旋转";
 
       function updateFace() {
-        current.textContent = spinFaces[faceIndex];
+        current.textContent = geminiThemes[faceIndex];
         setProgress(faceIndex);
-        faceIndex = (faceIndex + 1) % spinFaces.length;
+        faceIndex = (faceIndex + 1) % geminiThemes.length;
       }
 
       updateFace();
