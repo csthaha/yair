@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Photo Cube</title>
+  <style>
+    :root {
+      --ink: #fff9ff;
+      --muted: rgba(255, 245, 252, 0.82);
+      --panel: rgba(255, 255, 255, 0.1);
+      --line: rgba(255, 214, 127, 0.32);
+      --pink: #ff89d7;
+      --cyan: #83f3ff;
+      --mint: #b08bff;
+      --gold: #ffd27f;
+      --cube: clamp(190px, 31vw, 330px);
+      --half: calc(var(--cube) / 2);
+      --net: calc(var(--cube) * 1.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, #33135e 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, #0b4563 0%, transparent 45%),
+        linear-gradient(135deg, #0b0618, #2a0f33 45%, #0f2d4a);
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 640px;
+      isolation: isolate;
+    }
+
+    .gemini-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(118deg, transparent 48%, rgba(255,255,255,0.16) 49%, transparent 51%),
+        linear-gradient(206deg, transparent 48%, rgba(131,243,255,0.14) 49%, transparent 51%),
+        radial-gradient(circle at 16% 24%, rgba(255,255,255,0.48) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 72% 18%, rgba(255,255,255,0.44) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 34% 72%, rgba(131,243,255,0.42) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 86% 78%, rgba(255,137,215,0.38) 0 1px, transparent 1.8px);
+      background-size: 13rem 13rem, 15rem 15rem, auto, auto, auto, auto;
+      mix-blend-mode: screen;
+      opacity: 0.52;
+      animation: skyShift 12s ease-in-out infinite alternate;
+    }
+
+    .hud {
+      position: absolute;
+      left: clamp(1rem, 4vw, 3rem);
+      top: clamp(1rem, 4vw, 3rem);
+      z-index: 5;
+      width: min(25rem, calc(100vw - 2rem));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2rem;
+      padding: 0.45rem 0.8rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.44);
+      backdrop-filter: blur(16px);
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      box-shadow: 0 12px 28px rgba(93,113,148,0.1);
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      content: "";
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--cyan));
+      box-shadow: 0 0 16px rgba(99,217,246,0.68);
+    }
+
+    h1 {
+      max-width: 25rem;
+      margin: 1rem 0 0;
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .copy {
+      max-width: 27rem;
+      margin: 0.9rem 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.72;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      perspective: 1300px;
+      transform-style: preserve-3d;
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: calc(50% + min(25vw, 13rem));
+      width: min(40vw, 25rem);
+      height: min(9vw, 5rem);
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(131,243,255,0.2), rgba(255,137,215,0.08) 42%, rgba(0,0,0,0));
+      filter: blur(14px);
+      z-index: 0;
+    }
+
+    .carousel {
+      position: relative;
+      z-index: 2;
+      width: min(64vw, 360px);
+      aspect-ratio: 1;
+      transform-style: preserve-3d;
+      transition: opacity 760ms ease, transform 1100ms cubic-bezier(0.2, 0.86, 0.18, 1);
+      animation: cardFloat 4.8s ease-in-out infinite;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.1);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.14),
+        0 26px 58px rgba(0,0,0,0.36),
+        0 0 42px rgba(131,243,255,0.13),
+        inset 0 1px 0 rgba(255,255,255,0.32);
+      opacity: 0;
+      transform: translateX(20%) rotateY(18deg) scale(0.92);
+      transition: opacity 420ms ease, transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      backface-visibility: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0) rotateY(0deg) scale(1);
+      z-index: 2;
+    }
+
+    .slide.previous {
+      opacity: 0;
+      transform: translateX(-20%) rotateY(-18deg) scale(0.92);
+      z-index: 1;
+    }
+
+    .slide img,
+    .face img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .slide::after,
+    .face::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.34), transparent 32%, transparent 68%, rgba(255,255,255,0.15)),
+        linear-gradient(180deg, transparent 52%, rgba(16,24,42,0.28));
+      mix-blend-mode: screen;
+    }
+
+    .slide figcaption,
+    .face figcaption {
+      position: absolute;
+      right: 16px;
+      bottom: 14px;
+      z-index: 2;
+      min-width: 82px;
+      padding: 0.42rem 0.7rem;
+      border: 1px solid rgba(255,255,255,0.34);
+      border-radius: 999px;
+      background: rgba(18,28,46,0.28);
+      color: rgba(255,255,255,0.95);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+      backdrop-filter: blur(10px);
+    }
+
+    .cube-scene {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 2;
+      width: var(--cube);
+      height: var(--cube);
+      transform: translate(-50%, -50%);
+      transform-style: preserve-3d;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 620ms ease;
+    }
+
+    .cube {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transform: rotateX(-8deg) rotateY(-18deg) scale(0.62);
+      transition: transform 1.85s cubic-bezier(0.18, 0.92, 0.2, 1);
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,214,127,0.26);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.1);
+      box-shadow:
+        0 18px 38px rgba(0,0,0,0.32),
+        0 0 32px rgba(131,243,255,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.28);
+      opacity: 0;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      transition:
+        transform 1.7s cubic-bezier(0.18, 0.88, 0.2, 1),
+        opacity 640ms ease,
+        box-shadow 500ms ease,
+        filter 500ms ease;
+      transition-delay: var(--delay, 0ms);
+      filter: saturate(1.02);
+    }
+
+    .face.front {
+      --delay: 0ms;
+      transform: translate3d(0, 0, 80px) rotateZ(-7deg) scale(0.22);
+    }
+
+    .face.right {
+      --delay: 70ms;
+      transform: translate3d(28px, 10px, 76px) rotateZ(10deg) scale(0.22);
+    }
+
+    .face.back {
+      --delay: 140ms;
+      transform: translate3d(-18px, -24px, 72px) rotateZ(-15deg) scale(0.22);
+    }
+
+    .face.left {
+      --delay: 210ms;
+      transform: translate3d(-28px, 12px, 68px) rotateZ(14deg) scale(0.22);
+    }
+
+    .face.top {
+      --delay: 280ms;
+      transform: translate3d(16px, -18px, 74px) rotateZ(20deg) scale(0.22);
+    }
+
+    .face.bottom {
+      --delay: 350ms;
+      transform: translate3d(-14px, 24px, 70px) rotateZ(-20deg) scale(0.22);
+    }
+
+    .app.is-assembling .carousel {
+      opacity: 0;
+      transform: translateY(-10px) rotateX(10deg) scale(0.82);
+      pointer-events: none;
+    }
+
+    .app.is-assembling .cube-scene {
+      opacity: 1;
+    }
+
+    .app.is-assembling .face {
+      opacity: 1;
+      filter: saturate(1.08) brightness(1.04);
+    }
+
+    .app.is-assembling .face.front {
+      transform: translate3d(0, 0, 60px) rotateZ(0deg) scale(0.96);
+    }
+
+    .app.is-assembling .face.right {
+      transform: translate3d(var(--net), 0, 40px) rotateZ(3deg) scale(0.96);
+    }
+
+    .app.is-assembling .face.back {
+      transform: translate3d(0, calc(var(--net) * -1), 28px) rotateZ(-3deg) scale(0.96);
+    }
+
+    .app.is-assembling .face.left {
+      transform: translate3d(calc(var(--net) * -1), 0, 40px) rotateZ(-3deg) scale(0.96);
+    }
+
+    .app.is-assembling .face.top {
+      transform: translate3d(0, calc(var(--net) * -2), 22px) rotateZ(4deg) scale(0.96);
+    }
+
+    .app.is-assembling .fac
+    e.bottom {
+      transform: translate3d(0, var(--net), 28px) rotateZ(-4deg) scale(0.96);
+    }
+
+    .app.is-folded .cube {
+      transform: rotateX(-23deg) rotateY(-34deg) scale(1);
+    }
+
+    .app.is-folded .face.front {
+      transform: translateZ(var(--half));
+    }
+
+    .app.is-folded .face.right {
+      transform: rotateY(90deg) translateZ(var(--half));
+    }
+
+    .app.is-folded .face.back {
+      transform: rotateY(180deg) translateZ(var(--half));
+    }
+
+    .app.is-folded .face.left {
+      transform: rotateY(-90deg) translateZ(var(--half));
+    }
+
+    .app.is-folded .face.top {
+      transform: rotateX(90deg) translateZ(var(--half));
+    }
+
+    .app.is-folded .face.bottom {
+      transform: rotateX(-90deg) translateZ(var(--half));
+    }
+
+    .app.is-spinning .cube {
+      animation: cubeSpin 24s linear infinite;
+    }
+
+    .app.is-spinning .face {
+      transition-delay: 0ms;
+      box-shadow:
+        0 22px 48px rgba(0,0,0,0.36),
+        inset 0 1px 0 rgba(255,255,255,0.34),
+        0 0 36px rgba(131,243,255,0.18);
+    }
+
+    .progress {
+      position: absolute;
+      left: 50%;
+      bottom: calc(clamp(1rem, 4vw, 2rem) + 3.8rem);
+      z-index: 5;
+      display: flex;
+      gap: 0.48rem;
+      transform: translateX(-50%);
+      padding: 0.5rem 0.6rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(16px);
+    }
+
+    .progress span {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.42);
+      transition: width 240ms ease, background 240ms ease, box-shadow 240ms ease;
+    }
+
+    .progress span.active {
+      width: 1.4rem;
+      background: linear-gradient(135deg, var(--pink), var(--cyan));
+      box-shadow: 0 0 16px rgba(99,217,246,0.68);
+    }
+
+    .status {
+      position: absolute;
+      left: 50%;
+      bottom: clamp(1rem, 4vw, 2rem);
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      transform: translateX(-50%);
+      min-height: 2.8rem;
+      max-width: calc(100vw - 2rem);
+      padding: 0.72rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08) 42%, rgba(255,137,215,0.12));
+      color: var(--muted);
+      font-size: 0.92rem;
+      white-space: nowrap;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.14), 0 18px 44px rgba(0,0,0,0.38);
+      backdrop-filter: blur(18px);
+    }
+
+    .status i {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--cyan));
+      box-shadow: 0 0 18px rgba(99,217,246,0.72);
+      flex: 0 0 auto;
+    }
+
+    .status strong {
+      color: var(--ink);
+    }
+
+    @keyframes skyShift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(0.7rem, -0.5rem, 0); }
+    }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0) rotateX(0deg); }
+      50% { transform: translateY(-10px) rotateX(2deg); }
+    }
+
+    @keyframes cubeSpin {
+      0% { transform: rotateX(-23deg) rotateY(-34deg) scale(1); }
+      16.6% { transform: rotateX(-18deg) rotateY(-96deg) scale(1); }
+      33.3% { transform: rotateX(-22deg) rotateY(-182deg) scale(1); }
+      50% { transform: rotateX(-18deg) rotateY(-276deg) scale(1); }
+      66.6% { transform: rotateX(-84deg) rotateY(-336deg) scale(1); }
+      83.3% { transform: rotateX(72deg) rotateY(-390deg) scale(1); }
+      100% { transform: rotateX(-23deg) rotateY(-394deg) scale(1); }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --cube: min(62vw, 260px);
+      }
+
+      .app {
+        min-height: 620px;
+      }
+
+      .hud {
+        left: 1rem;
+        top: 1rem;
+      }
+
+      h1 {
+        max-width: 18rem;
+        font-size: 2.25rem;
+      }
+
+      .copy {
+        max-width: 19rem;
+        font-size: 0.92rem;
+      }
+
+      .carousel {
+        width: min(74vw, 310px);
+      }
+
+      .status {
+        font-size: 0.84rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <canvas class="gemini-canvas" id="geminiCanvas" aria-hidden="true"></canvas>
+
+    <section class="stage" aria-label="图片立方体动画">
+      <div class="carousel" id="carousel">
+        <figure class="slide active">
+          <img src="./001.png" alt="轮播图片 1">
+          <figcaption>Photo 01</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="./002.png" alt="轮播图片 2">
+          <figcaption>Photo 02</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="./003.png" alt="轮播图片 3">
+          <figcaption>Photo 03</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="./004.png" alt="轮播图片 4">
+          <figcaption>Photo 04</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="./005.png" alt="轮播图片 5">
+          <figcaption>Photo 05</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="./006.png" alt="轮播图片 6">
+          <figcaption>Photo 06</figcaption>
+        </figure>
+      </div>
+
+      <div class="cube-scene" aria-label="六面图片正方体">
+        <div class="cube" id="cube">
+          <figure class="face front">
+            <img src="./001.png" alt="立方体正面">
+            <figcaption>Face 01</figcaption>
+          </figure>
+          <figure class="face right">
+            <img src="./002.png" alt="立方体右面">
+            <figcaption>Face 02</figcaption>
+          </figure>
+          <figure class="face back">
+            <img src="./003.png" alt="立方体背面">
+            <figcaption>Face 03</figcaption>
+          </figure>
+          <figure class="face left">
+            <img src="./004.png" alt="立方体左面">
+            <figcaption>Face 04</figcaption>
+          </figure>
+          <figure class="face top">
+            <img src="./005.png" alt="立方体顶面">
+            <figcaption>Face 05</figcaption>
+          </figure>
+          <figure class="face bottom">
+            <img src="./006.png" alt="立方体底面">
+            <figcaption>Face 06</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <div class="progress" id="progress" aria-hidden="true">
+      <span class="active"></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="status">
+      <i aria-hidden="true"></i>
+      <span><span id="phase">图片轮播</span> <strong id="current">Photo 01</strong></span>
+    </div>
+  </main>
+
+  <script>
+    const app = document.getElementById("app");
+    const bgCanvas = document.getElementById("geminiCanvas");
+    const bgCtx = bgCanvas.getContext("2d");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dots = Array.from(document.querySelectorAll("#progress span"));
+    const phase = document.getElementById("phase");
+    const current = document.getElementById("current");
+    const slideDuration = 980;
+    const spinFaces = ["Face 01", "Face 02", "Face 03", "Face 04", "Face 05", "Face 06"];
+    let currentSlide = 0;
+    let bgWidth = 0;
+    let bgHeight = 0;
+    let bgDpr = 1;
+    let bgTime = 0;
+    const stars = [];
+    const dust = [];
+    const ribbons = [];
+    const bursts = [];
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function resizeBackground() {
+      bgDpr = Math.min(window.devicePixelRatio || 1, 2);
+      bgWidth = window.innerWidth;
+      bgHeight = window.innerHeight;
+      bgCanvas.width = Math.round(bgWidth * bgDpr);
+      bgCanvas.height = Math.round(bgHeight * bgDpr);
+      bgCanvas.style.width = bgWidth + "px";
+      bgCanvas.style.height = bgHeight + "px";
+      bgCtx.setTransform(bgDpr, 0, 0, bgDpr, 0, 0);
+      initHappyDayBackground();
+    }
+
+    function initHappyDayBackground() {
+      stars.length = 0;
+      dust.length = 0;
+      ribbons.length = 0;
+
+      const starCount = Math.floor((bgWidth * bgHeight) / 6500);
+      const dustCount = Math.floor((bgWidth * bgHeight) / 9000);
+      const ribbonCount = Math.max(5, Math.floor(bgWidth / 300));
+
+      for (let i = 0; i < starCount; i += 1) {
+        stars.push({
+          x: rand(0, bgWidth),
+          y: rand(0, bgHeight),
+          r: rand(0.6, 2.2),
+          twinkle: rand(0.3, 1.4),
+          phase: rand(0, Math.PI * 2)
+        });
+      }
+
+      for (let i = 0; i < dustCount; i += 1) {
+        dust.push({
+          x: rand(0, bgWidth),
+          y: rand(0, bgHeight),
+          vx: rand(-0.25, 0.25),
+          vy: rand(-0.2, 0.2),
+          r: rand(1, 2.8),
+          hue: rand(180, 330)
+        });
+      }
+
+      for (let i = 0; i < ribbonCount; i += 1) {
+        ribbons.push({
+          y: rand(bgHeight * 0.18, bgHeight * 0.86),
+          amp: rand(16, 42),
+          speed: rand(0.2, 0.75),
+          thick: rand(1.2, 3.8),
+          hue: rand(180, 300),
+          phase: rand(0, Math.PI * 2)
+        });
+      }
+    }
+
+    function drawGeminiBackground(time) {
+      bgTime += 0.016;
+      bgCtx.clearRect(0, 0, bgWidth, bgHeight);
+      drawHappyDayWash();
+      drawStars(bgTime);
+      drawRibbons(bgTime);
+      drawDust();
+      drawGeminiCore(bgTime);
+      drawGeminiSymbol(bgTime);
+      drawBursts();
+      requestAnimationFrame(drawGeminiBackground);
+    }
+
+    function drawHappyDayWash() {
+      const gradient = bgCtx.createLinearGradient(0, 0, bgWidth, bgHeight);
+      gradient.addColorStop(0, "rgba(13,14,39,0.46)");
+      gradient.addColorStop(0.48, "rgba(53,18,83,0.34)");
+      gradient.addColorStop(1, "rgba(7,45,71,0.42)");
+      bgCtx.fillStyle = gradient;
+      bgCtx.fillRect(0, 0, bgWidth, bgHeight);
+    }
+
+    function drawStars(now) {
+      for (const star of stars) {
+        const glow = 0.4 + 0.6 * Math.sin(now * star.twinkle + star.phase);
+        bgCtx.beginPath();
+        bgCtx.fillStyle = `rgba(255,255,255,${0.22 + glow * 0.7})`;
+        bgCtx.arc(star.x, star.y, star.r + glow * 0.8, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+    }
+
+    function drawRibbons(now) {
+      for (const ribbon of ribbons) {
+        bgCtx.beginPath();
+        for (let x = -30; x <= bgWidth + 30; x += 6) {
+          const wave = Math.sin(x * 0.01 + now * ribbon.speed + ribbon.phase) * ribbon.amp;
+          const y = ribbon.y + wave;
+          if (x === -30) {
+            bgCtx.moveTo(x, y);
+          } else {
+            bgCtx.lineTo(x, y);
+          }
+        }
+        bgCtx.strokeStyle = `hsla(${ribbon.hue},95%,72%,0.2)`;
+        bgCtx.lineWidth = ribbon.thick;
+        bgCtx.shadowColor = `hsla(${ribbon.hue},95%,72%,0.42)`;
+        bgCtx.shadowBlur = 14;
+        bgCtx.stroke();
+      }
+      bgCtx.shadowBlur = 0;
+    }
+
+    function drawDust() {
+      for (const particle of dust) {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        if (particle.x < -5) particle.x = bgWidth + 5;
+        if (particle.x > bgWidth + 5) particle.x = -5;
+        if (particle.y < -5) particle.y = bgHeight + 5;
+        if (particle.y > bgHeight + 5) particle.y = -5;
+
+        bgCtx.beginPath();
+        bgCtx.fillStyle = `hsla(${particle.hue},95%,75%,0.55)`;
+        bgCtx.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+    }
+
+    function drawGeminiCore(now) {
+      const cx = bgWidth * 0.5;
+      const cy = bgHeight * 0.56;
+      const orbit = Math.min(bgWidth, bgHeight) * 0.12;
+      const speed = now * 0.95;
+      const ax = cx + Math.cos(speed) * orbit;
+      const ay = cy + Math.sin(speed * 1.2) * orbit * 0.66;
+      const bx = cx + Math.cos(speed + Math.PI) * orbit;
+      const by = cy + Math.sin((speed + Math.PI) * 1.2) * orbit * 0.66;
+
+      const beam = bgCtx.createLinearGradient(ax, ay, bx, by);
+      beam.addColorStop(0, "rgba(131,243,255,0.88)");
+      beam.addColorStop(0.5, "rgba(255,255,255,0.78)");
+      beam.addColorStop(1, "rgba(255,137,215,0.88)");
+      bgCtx.strokeStyle = beam;
+      bgCtx.lineWidth = Math.max(2, Math.min(bgWidth, bgHeight) * 0.0045);
+      bgCtx.shadowColor = "rgba(170,220,255,0.75)";
+      bgCtx.shadowBlur = 22;
+      bgCtx.beginPath();
+      bgCtx.moveTo(ax, ay);
+      bgCtx.lineTo(bx, by);
+      bgCtx.stroke();
+
+      const pulse = 11 + Math.sin(now * 2.7) * 3;
+      drawNeonPlanet(ax, ay, pulse, "rgba(131,243,255,0.78)");
+      drawNeonPlanet(bx, by, pulse, "rgba(255,137,215,0.78)");
+      drawConstellation(ax, ay, bx, by, now);
+      bgCtx.shadowBlur = 0;
+    }
+
+    function drawNeonPlanet(x, y, radius, color) {
+      const halo = bgCtx.createRadialGradient(x, y, radius * 0.2, x, y, radius * 3.4);
+      halo.addColorStop(0, "rgba(255,255,255,0.95)");
+      halo.addColorStop(0.25, color);
+      halo.addColorStop(1, "rgba(255,255,255,0)");
+      bgCtx.beginPath();
+      bgCtx.fillStyle = halo;
+      bgCtx.arc(x, y, radius * 3.4, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.beginPath();
+      bgCtx.fillStyle = "#fff";
+      bgCtx.arc(x, y, radius * 0.6, 0, Math.PI * 2);
+      bgCtx.fill();
+    }
+
+    function drawConstellation(ax, ay, bx, by, now) {
+      const midX = (ax + bx) / 2;
+      const midY = (ay + by) / 2;
+      const spread = Math.min(bgWidth, bgHeight) * 0.11;
+      const nodes = [
+        [ax, ay],
+        [midX - spread * 0.55, midY - spread * 0.8],
+        [midX, midY - spread * 0.2],
+        [midX + spread * 0.55, midY - spread * 0.8],
+        [bx, by],
+        [midX - spread * 0.42, midY + spread * 0.9],
+        [midX + spread * 0.42, midY + spread * 0.9]
+      ];
+
+      bgCtx.strokeStyle = `rgba(255,255,255,${0.24 + Math.sin(now * 2) * 0.12})`;
+      bgCtx.lineWidth = 1.4;
+      bgCtx.beginPath();
+      bgCtx.moveTo(nodes[1][0], nodes[1][1]);
+      bgCtx.lineTo(nodes[2][0], nodes[2][1]);
+      bgCtx.lineTo(nodes[3][0], nodes[3][1]);
+      bgCtx.moveTo(nodes[5][0], nodes[5][1]);
+      bgCtx.lineTo(nodes[2][0], nodes[2][1]);
+      bgCtx.lineTo(nodes[6][0], nodes[6][1]);
+      bgCtx.stroke();
+
+      for (const [x, y] of nodes) {
+        bgCtx.beginPath();
+        bgCtx.fillStyle = "rgba(255,255,255,0.92)";
+        bgCtx.arc(x, y, 2.2, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+    }
+
+    function drawGeminiSymbol(now) {
+      const x = bgWidth * 0.5;
+      const y = bgHeight * 0.2;
+      const size = Math.min(bgWidth, bgHeight) * 0.05;
+      const sway = Math.sin(now * 1.4) * 6;
+
+      bgCtx.save();
+      bgCtx.translate(x, y + sway);
+      bgCtx.strokeStyle = "rgba(255,214,127,0.82)";
+      bgCtx.lineWidth = Math.max(2, size * 0.12);
+      bgCtx.shadowColor = "rgba(255,214,127,0.62)";
+      bgCtx.shadowBlur = 16;
+      bgCtx.lineCap = "round";
+      bgCtx.beginPath();
+      bgCtx.moveTo(-size * 0.7, -size * 0.8);
+      bgCtx.lineTo(size * 0.7, -size * 0.8);
+      bgCtx.moveTo(-size * 0.7, size * 0.8);
+      bgCtx.lineTo(size * 0.7, size * 0.8);
+      bgCtx.moveTo(-size * 0.45, -size * 0.8);
+      bgCtx.lineTo(-size * 0.45, size * 0.8);
+      bgCtx.moveTo(size * 0.45, -size * 0.8);
+      bgCtx.lineTo(size * 0.45, size * 0.8);
+      bgCtx.stroke();
+      bgCtx.restore();
+    }
+
+    function spawnBurst(x, y, size = 1) {
+      const count = 26 + Math.floor(14 * size);
+      for (let i = 0; i < count; i += 1) {
+        const angle = rand(0, Math.PI * 2);
+        const speed = rand(1.2, 3.8) * size;
+        const life = rand(35, 72);
+        bursts.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life,
+          maxLife: life,
+          hue: rand(180, 340),
+          r: rand(1.2, 3.2)
+        });
+      }
+    }
+
+    function drawBursts() {
+      for (let i = bursts.length - 1; i >= 0; i -= 1) {
+        const burst = bursts[i];
+        burst.x += burst.vx;
+        burst.y += burst.vy;
+        burst.vx *= 0.98;
+        burst.vy *= 0.98;
+        burst.vy += 0.015;
+        burst.life -= 1;
+        const alpha = Math.max(0, burst.life / burst.maxLife);
+
+        bgCtx.beginPath();
+        bgCtx.fillStyle = `hsla(${burst.hue},98%,73%,${alpha})`;
+        bgCtx.arc(burst.x, burst.y, burst.r * alpha + 0.8, 0, Math.PI * 2);
+        bgCtx.fill();
+
+        if (burst.life <= 0) {
+          bursts.splice(i, 1);
+        }
+      }
+    }
+
+    function setProgress(index) {
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle("active", dotIndex === index);
+      });
+    }
+
+    function showSlide(index) {
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("active", slideIndex === index);
+        slide.classList.toggle("previous", slideIndex === index - 1);
+      });
+
+      phase.textContent = "图片轮播";
+      current.textContent = "Photo " + String(index + 1).padStart(2, "0");
+      setProgress(index);
+    }
+
+    function playCarousel() {
+      showSlide(currentSlide);
+
+      if (currentSlide < slides.length - 1) {
+        currentSlide += 1;
+        window.setTimeout(playCarousel, slideDuration);
+        return;
+      }
+
+      window.setTimeout(startAssembling, slideDuration + 180);
+    }
+
+    function startAssembling() {
+      app.classList.add("is-assembling");
+      phase.textContent = "正在拼成立方体";
+      current.textContent = "六面合成";
+      dots.forEach((dot) => dot.classList.add("active"));
+
+      window.setTimeout(() => {
+        app.classList.add("is-folded");
+      }, 980);
+
+      window.setTimeout(startSpinning, 3400);
+    }
+
+    function startSpinning() {
+      let faceIndex = 0;
+      app.classList.add("is-spinning");
+      phase.textContent = "立方体旋转";
+
+      function updateFace() {
+        current.textContent = spinFaces[faceIndex];
+        setProgress(faceIndex);
+        faceIndex = (faceIndex + 1) % spinFaces.length;
+      }
+
+      updateFace();
+      window.setInterval(updateFace, 4000);
+    }
+
+    function pointerBurst(event) {
+      spawnBurst(event.clientX, event.clientY, 1 + Math.random() * 0.65);
+    }
+
+    window.addEventListener("load", () => {
+      resizeBackground();
+      requestAnimationFrame(drawGeminiBackground);
+      window.setTimeout(playCarousel, 280);
+      window.setTimeout(() => {
+        spawnBurst(bgWidth * 0.35, bgHeight * 0.62, 1.35);
+        spawnBurst(bgWidth * 0.65, bgHeight * 0.62, 1.35);
+      }, 500);
+      window.setInterval(() => {
+        spawnBurst(rand(bgWidth * 0.2, bgWidth * 0.8), rand(bgHeight * 0.28, bgHeight * 0.78), rand(0.7, 1.35));
+      }, 1800);
+    });
+
+    window.addEventListener("resize", resizeBackground);
+    window.addEventListener("click", pointerBurst);
+    window.addEventListener("pointermove", (event) => {
+      if (event.buttons > 0) {
+        pointerBurst(event);
+      }
+    });
+  </script>
+</body>
+</html>
