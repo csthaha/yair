@@ -770,10 +770,6 @@
       animation: activeFaceSweep 1.25s ease both;
     }
 
-    .cube-scene.is-face-pop {
-      animation: cubePop 620ms cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
     .gemini-result {
       --result-card-width: clamp(88px, 18vw, 128px);
       position: absolute;
@@ -1013,8 +1009,11 @@
       font-weight: 900;
       line-height: 1;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 4px 10px rgba(118,33,20,0.28);
-      transform: translate(-50%, -50%) rotate(90deg);
+      transform: translate(-50%, -50%);
     }
 
     .result-spark {
@@ -1265,11 +1264,6 @@
         opacity: 1;
         filter: brightness(1.28);
       }
-    }
-
-    @keyframes cubePop {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      42% { transform: translate(-50%, -50%) scale(1.055); }
     }
 
     @keyframes dotPulse {
@@ -1589,32 +1583,32 @@
         </div>
         <div class="result-orbit" aria-hidden="true">
           <div class="result-slot" style="--phase: 0;">
-            <figure class="result-photo" style="--axis-yaw: 30deg; --pop-delay: 0ms;">
+            <figure class="result-photo" style="--axis-yaw: 45deg; --pop-delay: 0ms;">
               <img src="./001.png" alt="">
             </figure>
           </div>
           <div class="result-slot" style="--phase: 60;">
-            <figure class="result-photo" style="--axis-yaw: 30deg; --pop-delay: 70ms;">
+            <figure class="result-photo" style="--axis-yaw: 45deg; --pop-delay: 70ms;">
               <img src="./002.png" alt="">
             </figure>
           </div>
           <div class="result-slot" style="--phase: 120;">
-            <figure class="result-photo" style="--axis-yaw: 30deg; --pop-delay: 140ms;">
+            <figure class="result-photo" style="--axis-yaw: 45deg; --pop-delay: 140ms;">
               <img src="./003.png" alt="">
             </figure>
           </div>
           <div class="result-slot" style="--phase: 180;">
-            <figure class="result-photo" style="--axis-yaw: 30deg; --pop-delay: 210ms;">
+            <figure class="result-photo" style="--axis-yaw: 45deg; --pop-delay: 210ms;">
               <img src="./004.png" alt="">
             </figure>
           </div>
           <div class="result-slot" style="--phase: 240;">
-            <figure class="result-photo" style="--axis-yaw: 30deg; --pop-delay: 280ms;">
+            <figure class="result-photo" style="--axis-yaw: 45deg; --pop-delay: 280ms;">
               <img src="./005.png" alt="">
             </figure>
           </div>
           <div class="result-slot" style="--phase: 300;">
-            <figure class="result-photo" style="--axis-yaw: 30deg; --pop-delay: 350ms;">
+            <figure class="result-photo" style="--axis-yaw: 45deg; --pop-delay: 350ms;">
               <img src="./006.png" alt="">
             </figure>
           </div>
@@ -1650,6 +1644,7 @@
     const cubeScene = document.querySelector(".cube-scene");
     const faces = Array.from(document.querySelectorAll(".face"));
     const resultSlots = Array.from(document.querySelectorAll(".result-slot"));
+    const resultPhotos = Array.from(document.querySelectorAll(".result-photo"));
     const dots = Array.from(document.querySelectorAll("#progress span"));
     const phase = document.getElementById("phase");
     const current = document.getElementById("current");
@@ -2145,9 +2140,6 @@
         faces.forEach((face, index) => {
           face.classList.toggle("is-current", index === faceIndex);
         });
-        cubeScene.classList.remove("is-face-pop");
-        void cubeScene.offsetWidth;
-        cubeScene.classList.add("is-face-pop");
         current.textContent = geminiThemes[faceIndex];
         setProgress(faceIndex);
         spawnBurst(bgWidth * 0.5, bgHeight * 0.52, 0.72);
@@ -2164,27 +2156,41 @@
       resultTime += 0.016;
       const isMobile = bgWidth < 720;
       const maxRadius = Math.min(bgWidth * (isMobile ? 0.36 : 0.26), isMobile ? 150 : 220);
-      const cycle = 4.8;
-      const cycleTime = (resultTime % cycle) / cycle;
-      const outward = cycleTime < 0.5
-        ? easeInOutCubic(cycleTime * 2)
-        : easeInOutCubic((1 - cycleTime) * 2);
-      const radius = maxRadius * outward;
-      const spin = resultTime * 0.82;
-      const depthBoost = 84 * outward;
+      const cardDuration = 1.28;
+      const cycle = cardDuration * resultSlots.length;
+      const cyclePosition = resultTime % cycle;
+      const activeIndex = Math.floor(cyclePosition / cardDuration);
+      const activeProgress = (cyclePosition - activeIndex * cardDuration) / cardDuration;
+      const activeOutward = activeProgress < 0.5
+        ? easeInOutCubic(activeProgress * 2)
+        : easeInOutCubic((1 - activeProgress) * 2);
+      const spin = resultTime * 0.58;
+      setProgress(activeIndex);
+      current.textContent = `${geminiThemes[activeIndex]} / 3D 合成轮转`;
 
       resultSlots.forEach((slot, index) => {
         const baseAngle = (index / resultSlots.length) * Math.PI * 2 - Math.PI / 2;
-        const angle = baseAngle + spin;
+        const isActive = index === activeIndex;
+        const idle = isActive ? 0 : 0.12;
+        const outward = isActive ? activeOutward : idle;
+        const radius = maxRadius * outward;
+        const depthBoost = 84 * outward;
+        const angle = baseAngle + spin + activeOutward * Math.PI * 0.58;
         const x = Math.sin(angle) * radius;
         const z = Math.cos(angle) * (radius + depthBoost);
         const y = Math.sin(angle * 2 + index * 0.35) * 12 * outward;
         const front = (Math.cos(angle) + 1) / 2;
-        const scale = 0.58 + outward * 0.34 + front * 0.16;
-        const brightness = 0.68 + outward * 0.26 + front * 0.22;
-        const opacity = clamp01(0.48 + outward * 0.62);
+        const scale = isActive
+          ? 0.7 + outward * 0.34 + front * 0.14
+          : 0.36 + front * 0.06;
+        const brightness = isActive
+          ? 0.78 + outward * 0.28 + front * 0.2
+          : 0.44 + front * 0.08;
+        const opacity = isActive
+          ? clamp01(0.62 + outward * 0.42)
+          : 0.2;
 
-        slot.style.zIndex = String(100 + Math.round(front * 90 + outward * 40));
+        slot.style.zIndex = String(isActive ? 180 + Math.round(front * 60) : 70 + index);
         slot.style.opacity = opacity.toFixed(3);
         slot.style.filter = `brightness(${brightness.toFixed(3)}) saturate(${(0.88 + outward * 0.34).toFixed(3)})`;
         const orbitYaw = -angle * 180 / Math.PI;
@@ -2194,11 +2200,68 @@
       requestAnimationFrame(renderResultCarousel);
     }
 
+    function renderAccumulatingResultCarousel() {
+      if (!resultStarted) return;
+
+      resultTime += 0.016;
+      const isMobile = bgWidth < 720;
+      const maxRadius = Math.min(bgWidth * (isMobile ? 0.36 : 0.26), isMobile ? 150 : 220);
+      const joinDuration = 0.86;
+      const joinGap = 0.42;
+      const buildDuration = joinGap * (resultSlots.length - 1) + joinDuration;
+      const rotateDuration = 30;
+      const rotateTurns = 3;
+      const loopDuration = buildDuration + rotateDuration;
+      const loopTime = resultTime % loopDuration;
+      const assembled = loopTime >= buildDuration;
+      const joinedCount = assembled
+        ? resultSlots.length
+        : Math.max(1, Math.min(resultSlots.length, Math.floor(loopTime / joinGap) + 1));
+      const rotateTime = Math.max(0, loopTime - buildDuration);
+      const spin = assembled
+        ? (rotateTime / rotateDuration) * Math.PI * 2 * rotateTurns
+        : loopTime * 0.28;
+      const progressIndex = assembled ? resultSlots.length - 1 : joinedCount - 1;
+      setProgress(progressIndex);
+      current.textContent = assembled ? "六张图片整体 3D 旋转" : `${geminiThemes[progressIndex]} 加入合成`;
+
+      resultSlots.forEach((slot, index) => {
+        const baseAngle = (index / resultSlots.length) * Math.PI * 2 - Math.PI / 2;
+        const joinStart = index * joinGap;
+        const rawJoin = (loopTime - joinStart) / joinDuration;
+        const joining = rawJoin > 0 && rawJoin < 1;
+        const joined = assembled || rawJoin >= 1;
+        const joinProgress = joined ? 1 : joining ? easeOutBack(rawJoin) : 0;
+        const progress = clamp01(joinProgress);
+        const settle = clamp01((loopTime - buildDuration) / 0.9);
+        const angle = baseAngle + spin + (1 - progress) * Math.PI * 0.9;
+        const radius = maxRadius * progress;
+        const depthBoost = 76 * progress;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * (radius + depthBoost);
+        const y = Math.sin(angle * 2 + index * 0.35) * 9 * progress;
+        const front = (Math.cos(angle) + 1) / 2;
+        const scale = (0.58 + progress * 0.36 + front * 0.12) * (1 + settle * 0.025 * Math.sin(resultTime + index));
+        const brightness = 0.54 + progress * 0.34 + front * 0.22;
+        const opacity = progress > 0 ? clamp01(0.18 + progress * 0.86) : 0;
+        const axisYaw = 34 + front * 26;
+
+        slot.style.zIndex = String(90 + Math.round(front * 90 + progress * 50));
+        slot.style.opacity = opacity.toFixed(3);
+        slot.style.filter = `brightness(${brightness.toFixed(3)}) saturate(${(0.82 + progress * 0.38).toFixed(3)})`;
+        const orbitYaw = -angle * 180 / Math.PI;
+        slot.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) rotateY(${orbitYaw.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+        resultPhotos[index].style.setProperty("--axis-yaw", `${axisYaw.toFixed(2)}deg`);
+      });
+
+      requestAnimationFrame(renderAccumulatingResultCarousel);
+    }
+
     function startResultCarousel() {
       if (resultStarted) return;
       resultStarted = true;
       resultTime = 0;
-      requestAnimationFrame(renderResultCarousel);
+      requestAnimationFrame(renderAccumulatingResultCarousel);
     }
 
     function showGeminiResult() {
