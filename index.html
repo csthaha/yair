@@ -7,13 +7,17 @@
   <style>
     :root {
       --ink: #fff9ff;
-      --muted: rgba(255, 245, 252, 0.82);
-      --panel: rgba(255, 255, 255, 0.1);
-      --line: rgba(255, 214, 127, 0.32);
-      --pink: #ff89d7;
+      --muted: rgba(246, 252, 255, 0.84);
+      --panel: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 226, 112, 0.36);
+      --pink: #ff8bc9;
       --cyan: #83f3ff;
-      --mint: #b08bff;
-      --gold: #ffd27f;
+      --mint: #80ffbb;
+      --gold: #ffe56f;
+      --lemon: #fff36a;
+      --sky: #6ce6ff;
+      --leaf: #8cffb6;
+      --violet: #9a8bff;
       --cube: clamp(190px, 31vw, 330px);
       --half: calc(var(--cube) / 2);
       --net: calc(var(--cube) * 1.08);
@@ -25,7 +29,11 @@
 
     html,
     body {
+      width: 100%;
       height: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
     }
 
     body {
@@ -34,9 +42,10 @@
       color: var(--ink);
       font-family: "Trebuchet MS", "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 20% 20%, #33135e 0%, transparent 45%),
-        radial-gradient(circle at 80% 80%, #0b4563 0%, transparent 45%),
-        linear-gradient(135deg, #0b0618, #2a0f33 45%, #0f2d4a);
+        radial-gradient(circle at 16% 12%, rgba(255,243,106,0.26) 0%, transparent 34%),
+        radial-gradient(circle at 80% 18%, rgba(108,230,255,0.24) 0%, transparent 40%),
+        radial-gradient(circle at 53% 84%, rgba(140,255,182,0.16) 0%, transparent 42%),
+        linear-gradient(135deg, #081225, #16284b 42%, #0b3a4b 72%, #2d2352);
     }
 
     .app {
@@ -44,6 +53,8 @@
       width: 100%;
       height: 100%;
       min-height: 640px;
+      max-width: 100vw;
+      overflow: hidden;
       isolation: isolate;
     }
 
@@ -72,8 +83,22 @@
         radial-gradient(circle at 86% 78%, rgba(255,137,215,0.38) 0 1px, transparent 1.8px);
       background-size: 13rem 13rem, 15rem 15rem, auto, auto, auto, auto;
       mix-blend-mode: screen;
-      opacity: 0.52;
-      animation: skyShift 12s ease-in-out infinite alternate;
+      opacity: 0.58;
+      animation: skyShift 15s ease-in-out infinite alternate;
+    }
+
+    .app::after {
+      content: "";
+      position: absolute;
+      inset: -22%;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        conic-gradient(from 90deg at 50% 50%, transparent, rgba(255,243,106,0.11), transparent, rgba(108,230,255,0.13), transparent),
+        radial-gradient(circle at 50% 50%, transparent 0 28%, rgba(255,255,255,0.08) 29%, transparent 31%);
+      mix-blend-mode: screen;
+      opacity: 0.62;
+      animation: twinAura 18s linear infinite;
     }
 
     .hud {
@@ -81,8 +106,23 @@
       left: clamp(1rem, 4vw, 3rem);
       top: clamp(1rem, 4vw, 3rem);
       z-index: 5;
-      width: min(25rem, calc(100vw - 2rem));
+      width: min(30rem, calc(100vw - 2rem));
       pointer-events: none;
+      animation: hudIntro 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .hud::before {
+      content: "♊";
+      position: absolute;
+      right: 0.2rem;
+      top: -1.3rem;
+      z-index: -1;
+      color: rgba(255,255,255,0.1);
+      font-family: Georgia, serif;
+      font-size: clamp(5rem, 14vw, 9rem);
+      line-height: 1;
+      text-shadow: 0 0 34px rgba(255,229,111,0.28);
+      animation: glyphBreathe 4.8s ease-in-out infinite;
     }
 
     .eyebrow {
@@ -93,13 +133,13 @@
       padding: 0.45rem 0.8rem;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255,255,255,0.44);
+      background: rgba(8,18,37,0.38);
       backdrop-filter: blur(16px);
       color: var(--muted);
       font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      box-shadow: 0 12px 28px rgba(93,113,148,0.1);
+      box-shadow: 0 12px 28px rgba(93,113,148,0.18);
     }
 
     .eyebrow::before,
@@ -117,7 +157,13 @@
       margin: 1rem 0 0;
       font-size: clamp(2.2rem, 5vw, 4.8rem);
       line-height: 0.96;
-      letter-spacing: 0;
+      letter-spacing: -0.05em;
+      text-wrap: balance;
+      background: linear-gradient(120deg, #fff, var(--lemon) 32%, var(--sky) 66%, #fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.28));
     }
 
     .copy {
@@ -128,6 +174,177 @@
       line-height: 1.72;
     }
 
+    .trait-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.52rem;
+      max-width: 28rem;
+      margin-top: 1rem;
+    }
+
+    .trait {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2rem;
+      padding: 0.38rem 0.72rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      background:
+        linear-gradient(135deg, rgba(255,243,106,0.2), rgba(108,230,255,0.12)),
+        rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.88);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 12px 26px rgba(0,0,0,0.12);
+      backdrop-filter: blur(14px);
+      animation: traitDrift 5.4s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .trait:nth-child(2) { --delay: 0.35s; }
+    .trait:nth-child(3) { --delay: 0.7s; }
+    .trait:nth-child(4) { --delay: 1.05s; }
+    .trait:nth-child(5) { --delay: 1.4s; }
+
+    .gemini-orbit {
+      position: absolute;
+      right: clamp(1rem, 4vw, 3.2rem);
+      /* top: clamp(1rem, 5vw, 4rem); */
+      bottom: 20%;
+      z-index: 5;
+      /* width: min(18.5rem, 32vw); */
+      width: 100%;
+      padding: 8rem;
+      min-height: 13.5rem;
+      pointer-events: none;
+      animation: hudIntro 1100ms 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      inset: 1rem 0.5rem 0.5rem;
+      border: 1px solid rgba(255,243,106,0.28);
+      border-radius: 48% 52% 50% 50%;
+      transform: rotate(-14deg);
+      box-shadow:
+        0 0 34px rgba(108,230,255,0.12),
+        inset 0 0 24px rgba(255,255,255,0.06);
+      animation: orbitSkew 9s ease-in-out infinite;
+    }
+
+    .mercury-dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0.72rem;
+      height: 0.72rem;
+      margin: -0.36rem 0 0 -0.36rem;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 20px rgba(255,229,111,0.78);
+      transform-origin: 0 0;
+      animation: mercuryRun 5.8s linear infinite;
+    }
+
+    .twin-card {
+      position: absolute;
+      width: 8.4rem;
+      padding: 0.7rem 0.78rem;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 1.25rem;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.06)),
+        rgba(12,27,49,0.34);
+      box-shadow: 0 18px 42px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.22);
+      backdrop-filter: blur(16px);
+    }
+
+    .twin-card::before {
+      content: "";
+      display: block;
+      width: 0.52rem;
+      height: 0.52rem;
+      margin-bottom: 0.45rem;
+      border-radius: 50%;
+      background: var(--sky);
+      box-shadow: 0 0 18px rgba(108,230,255,0.72);
+    }
+
+    .twin-card strong,
+    .twin-card span {
+      display: block;
+    }
+
+    .twin-card strong {
+      color: #fff;
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .twin-card span {
+      margin-top: 0.2rem;
+      color: rgba(246,252,255,0.76);
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .twin-card.castor {
+      left: 4rem;
+      bottom: 0.6rem;
+      animation: twinFloatA 5.4s ease-in-out infinite;
+    }
+
+    .twin-card.pollux {
+      right: 2rem;
+      bottom: 0.6rem;
+      animation: twinFloatB 5.4s 0.3s ease-in-out infinite;
+    }
+
+    .twin-card.pollux::before {
+      background: var(--leaf);
+      box-shadow: 0 0 18px rgba(140,255,182,0.72);
+    }
+
+    .air-notes {
+      position: absolute;
+      /* right: clamp(1rem, 4vw, 3rem); */
+      right: 0;
+      top: 4rem;
+      /* bottom: calc(clamp(1rem, 4vw, 2rem) + 6.5rem); */
+      z-index: 5;
+      display: grid;
+      gap: 0.55rem;
+      width: min(18rem, 34vw);
+      pointer-events: none;
+    }
+
+    .air-note {
+      position: relative;
+      justify-self: end;
+      max-width: 100%;
+      padding: 0.62rem 0.82rem;
+      border: 1px solid rgba(255,255,255,0.19);
+      border-radius: 1rem 1rem 0.18rem 1rem;
+      background: rgba(10,26,48,0.32);
+      color: rgba(255,255,255,0.82);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.2);
+      backdrop-filter: blur(16px);
+      animation: noteFloat 6s ease-in-out infinite;
+    }
+
+    .air-note:nth-child(2) {
+      justify-self: start;
+      border-radius: 1rem 1rem 1rem 0.18rem;
+      animation-delay: 0.65s;
+    }
+
+    .air-note:nth-child(3) {
+      animation-delay: 1.3s;
+    }
+
     .stage {
       position: absolute;
       inset: 0;
@@ -136,6 +353,25 @@
       place-items: center;
       perspective: 1300px;
       transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .stage::before {
+      content: "Ⅱ";
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      z-index: 0;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.07);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(18rem, 42vw, 34rem);
+      line-height: 0.8;
+      letter-spacing: -0.16em;
+      text-shadow:
+        0 0 40px rgba(255,229,111,0.22),
+        0 0 90px rgba(108,230,255,0.18);
+      animation: twinGate 10s ease-in-out infinite;
     }
 
     .stage::after {
@@ -157,9 +393,35 @@
       z-index: 2;
       width: min(64vw, 360px);
       aspect-ratio: 1;
+      isolation: isolate;
       transform-style: preserve-3d;
       transition: opacity 760ms ease, transform 1100ms cubic-bezier(0.2, 0.86, 0.18, 1);
       animation: cardFloat 4.8s ease-in-out infinite;
+    }
+
+    .carousel::before,
+    .carousel::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      z-index: -1;
+      border-radius: 38% 62% 48% 52%;
+      pointer-events: none;
+    }
+
+    .carousel::before {
+      border: 1px solid rgba(255,229,111,0.24);
+      box-shadow: 0 0 34px rgba(255,229,111,0.1);
+      transform: rotate(12deg);
+      animation: orbitSkew 8.2s ease-in-out infinite;
+    }
+
+    .carousel::after {
+      inset: -13%;
+      border: 1px solid rgba(108,230,255,0.2);
+      border-radius: 58% 42% 50% 50%;
+      transform: rotate(-20deg);
+      animation: orbitSkew 8.2s 0.6s ease-in-out infinite reverse;
     }
 
     .slide {
@@ -176,20 +438,28 @@
         0 0 42px rgba(131,243,255,0.13),
         inset 0 1px 0 rgba(255,255,255,0.32);
       opacity: 0;
-      transform: translateX(20%) rotateY(18deg) scale(0.92);
-      transition: opacity 420ms ease, transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform: translateX(26%) rotateY(22deg) rotateZ(3deg) scale(0.88);
+      transition: opacity 460ms ease, filter 460ms ease, transform 760ms cubic-bezier(0.16, 1, 0.3, 1);
       backface-visibility: hidden;
+      filter: saturate(0.88) blur(1px);
     }
 
     .slide.active {
       opacity: 1;
       transform: translateX(0) rotateY(0deg) scale(1);
       z-index: 2;
+      filter: saturate(1.08) blur(0);
     }
 
     .slide.previous {
       opacity: 0;
-      transform: translateX(-20%) rotateY(-18deg) scale(0.92);
+      transform: translateX(-26%) rotateY(-22deg) rotateZ(-3deg) scale(0.88);
+      z-index: 1;
+    }
+
+    .slide.next {
+      opacity: 0;
+      transform: translateX(28%) rotateY(24deg) rotateZ(4deg) scale(0.88);
       z-index: 1;
     }
 
@@ -211,6 +481,28 @@
         linear-gradient(135deg, rgba(255,255,255,0.34), transparent 32%, transparent 68%, rgba(255,255,255,0.15)),
         linear-gradient(180deg, transparent 52%, rgba(16,24,42,0.28));
       mix-blend-mode: screen;
+    }
+
+    .slide::before,
+    .face::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.42), transparent 58%);
+      mix-blend-mode: screen;
+      opacity: 0;
+      transform: translateX(-42%) rotate(10deg);
+    }
+
+    .slide.active::before {
+      animation: mirrorSweep 980ms ease both;
+    }
+
+    .face::before {
+      animation: faceGlow 5.8s ease-in-out infinite;
+      animation-delay: var(--delay, 0ms);
     }
 
     .slide figcaption,
@@ -244,7 +536,38 @@
       transform-style: preserve-3d;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 620ms ease;
+      transition:
+        opacity 620ms ease,
+        transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cube-scene::before,
+    .cube-scene::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .cube-scene::before {
+      inset: -32%;
+      border-radius: 50%;
+      border: 1px solid rgba(255,229,111,0.22);
+      box-shadow:
+        0 0 22px rgba(255,229,111,0.16),
+        inset 0 0 28px rgba(108,230,255,0.12);
+      opacity: 0;
+      transform: rotateX(72deg) rotateZ(-18deg) scale(0.82);
+      transition: opacity 800ms ease, transform 800ms ease;
+    }
+
+    .cube-scene::after {
+      inset: -18%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,229,111,0.16), rgba(108,230,255,0.1) 32%, transparent 68%);
+      filter: blur(20px);
+      opacity: 0;
+      transition: opacity 800ms ease;
     }
 
     .cube {
@@ -253,7 +576,33 @@
       height: 100%;
       transform-style: preserve-3d;
       transform: rotateX(-8deg) rotateY(-18deg) scale(0.62);
-      transition: transform 1.85s cubic-bezier(0.18, 0.92, 0.2, 1);
+      transition: transform 1.95s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    .cube::before,
+    .cube::after {
+      content: "";
+      position: absolute;
+      inset: -22%;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.16);
+      pointer-events: none;
+      opacity: 0;
+      transform-style: preserve-3d;
+      transition: opacity 600ms ease;
+    }
+
+    .cube::before {
+      border-color: rgba(255,229,111,0.28);
+      box-shadow: 0 0 24px rgba(255,229,111,0.18);
+      transform: rotateX(78deg) rotateZ(16deg);
+    }
+
+    .cube::after {
+      border-color: rgba(108,230,255,0.24);
+      box-shadow: 0 0 24px rgba(108,230,255,0.16);
+      transform: rotateY(76deg) rotateZ(-12deg);
     }
 
     .face {
@@ -320,6 +669,15 @@
       opacity: 1;
     }
 
+    .app.is-assembling .cube-scene::before,
+    .app.is-assembling .cube-scene::after {
+      opacity: 1;
+    }
+
+    .app.is-folded .cube-scene::before {
+      transform: rotateX(72deg) rotateZ(12deg) scale(1.08);
+    }
+
     .app.is-assembling .face {
       opacity: 1;
       filter: saturate(1.08) brightness(1.04);
@@ -345,8 +703,7 @@
       transform: translate3d(0, calc(var(--net) * -2), 22px) rotateZ(4deg) scale(0.96);
     }
 
-    .app.is-assembling .fac
-    e.bottom {
+    .app.is-assembling .face.bottom {
       transform: translate3d(0, var(--net), 28px) rotateZ(-4deg) scale(0.96);
     }
 
@@ -379,7 +736,7 @@
     }
 
     .app.is-spinning .cube {
-      animation: cubeSpin 24s linear infinite;
+      animation: cubeSpin 18s cubic-bezier(0.3, 0.02, 0.18, 1) infinite;
     }
 
     .app.is-spinning .face {
@@ -388,6 +745,327 @@
         0 22px 48px rgba(0,0,0,0.36),
         inset 0 1px 0 rgba(255,255,255,0.34),
         0 0 36px rgba(131,243,255,0.18);
+    }
+
+    .app.is-spinning .cube::before {
+      opacity: 0.92;
+      animation: energyRingA 5.2s linear infinite;
+    }
+
+    .app.is-spinning .cube::after {
+      opacity: 0.72;
+      animation: energyRingB 4.4s linear infinite reverse;
+    }
+
+    .app.is-spinning .cube-scene::before {
+      animation: orbitPulse 3s ease-in-out infinite;
+    }
+
+    .app.is-spinning .face.is-current {
+      border-color: rgba(255,243,106,0.72);
+      filter: saturate(1.22) brightness(1.1);
+      box-shadow:
+        0 28px 62px rgba(0,0,0,0.42),
+        0 0 42px rgba(255,229,111,0.24),
+        0 0 58px rgba(108,230,255,0.16),
+        inset 0 1px 0 rgba(255,255,255,0.42);
+    }
+
+    .app.is-spinning .face.is-current::before {
+      animation: activeFaceSweep 1.25s ease both;
+    }
+
+    .gemini-result {
+      --result-card-width: clamp(88px, 18vw, 128px);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 4;
+      width: min(72vw, 420px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(0.72);
+      opacity: 0;
+      pointer-events: none;
+      isolation: isolate;
+      perspective: 920px;
+      perspective-origin: 50% 50%;
+      transform-style: preserve-3d;
+      transition:
+        opacity 560ms ease,
+        transform 820ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gemini-result::before,
+    .gemini-result::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+
+    .gemini-result::before {
+      width: 68%;
+      aspect-ratio: 1;
+      background:
+        radial-gradient(circle at 38% 32%, rgba(255,255,255,0.68), transparent 18%),
+        radial-gradient(circle, rgba(255,137,215,0.48), rgba(255,243,106,0.22) 42%, rgba(131,243,255,0.12) 68%, transparent 72%);
+      filter: blur(10px);
+      box-shadow: 0 0 68px rgba(255,137,215,0.38), 0 0 86px rgba(131,243,255,0.2);
+      opacity: 0.94;
+      animation: resultPulse 2.8s ease-in-out infinite;
+    }
+
+    .gemini-result::after {
+      width: 96%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(255,229,111,0.28);
+      box-shadow:
+        inset 0 0 32px rgba(131,243,255,0.12),
+        0 0 30px rgba(255,229,111,0.16);
+      animation: resultHalo 7.5s linear infinite;
+    }
+
+    .result-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 42;
+      display: grid;
+      place-items: center;
+      width: 42%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255,255,255,0.36);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,0.58), transparent 20%),
+        radial-gradient(circle at 58% 62%, rgba(131,243,255,0.22), transparent 36%),
+        linear-gradient(135deg, rgba(255,137,215,0.36), rgba(255,243,106,0.34) 50%, rgba(108,230,255,0.32));
+      box-shadow:
+        0 12px 34px rgba(0,0,0,0.24),
+        0 0 42px rgba(255,137,215,0.38),
+        0 0 68px rgba(131,243,255,0.24),
+        inset 0 1px 0 rgba(255,255,255,0.52);
+      opacity: 0.68;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .result-core::before,
+    .result-core::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .result-core::before {
+      inset: 14%;
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,0.42);
+      animation: resultHalo 5.2s linear infinite reverse;
+    }
+
+    .result-core::after {
+      inset: -28%;
+      background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.72), transparent 58%);
+      opacity: 0;
+      transform: translateX(-42%) rotate(12deg);
+    }
+
+    .result-title {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 0.16rem;
+      padding-top: 0.22rem;
+      font-size: clamp(1.18rem, 4.8vw, 2rem);
+      font-weight: 900;
+      line-height: 0.94;
+      letter-spacing: 0;
+      opacity: 0.84;
+      text-shadow: 0 2px 12px rgba(94,20,78,0.34);
+    }
+
+    .result-title span {
+      display: block;
+    }
+
+    .twin-stars {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.34rem;
+      margin-bottom: 0.14rem;
+    }
+
+    .twin-stars i {
+      width: clamp(0.5rem, 1.8vw, 0.72rem);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #fffef3;
+      box-shadow:
+        0 0 12px rgba(255,243,106,0.94),
+        0 0 24px rgba(131,243,255,0.58);
+      animation: twinStarBeat 1.8s ease-in-out infinite;
+    }
+
+    .twin-stars i:nth-child(2) {
+      background: #ecfff8;
+      animation-delay: 0.34s;
+    }
+
+    .result-subtitle {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin-top: 0.16rem;
+      color: rgba(255,255,255,0.84);
+      font-size: clamp(0.58rem, 1.9vw, 0.78rem);
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: 0 2px 10px rgba(94,20,78,0.28);
+      opacity: 0.74;
+    }
+
+    .result-orbit {
+      position: absolute;
+      inset: 0;
+      z-index: 80;
+      border-radius: 50%;
+      perspective: 880px;
+      perspective-origin: 50% 50%;
+      transform-style: preserve-3d;
+    }
+
+    .result-slot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--result-card-width);
+      aspect-ratio: 0.58;
+      opacity: 0;
+      filter: brightness(0.8) saturate(0.92);
+      transform: translate(-50%, -50%) translate3d(0, 0, -120px) scale(0.72);
+      transform-style: preserve-3d;
+      transform-origin: center;
+      will-change: transform, opacity, filter;
+    }
+
+    .result-photo {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      border: 2px solid rgba(255,243,106,0.72);
+      border-radius: 0.72rem;
+      background: linear-gradient(135deg, rgba(255,243,106,0.9), rgba(255,255,255,0.58));
+      box-shadow:
+        0 16px 34px rgba(0,0,0,0.32),
+        0 0 20px rgba(255,229,111,0.34),
+        inset 0 1px 0 rgba(255,255,255,0.76);
+      transform:
+        perspective(480px)
+        rotateY(var(--axis-yaw, 18deg));
+      transform-origin: center;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      opacity: 0;
+    }
+
+    .result-photo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      filter: saturate(1.12) brightness(1.04);
+    }
+
+    .result-photo::before {
+      content: "";
+      position: absolute;
+      inset: 6%;
+      z-index: 2;
+      border: 1px solid rgba(255,255,255,0.74);
+      border-radius: 0.48rem;
+      pointer-events: none;
+    }
+
+    .result-photo::after {
+      content: "Yair";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 3;
+      min-width: 0;
+      padding: 0;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      color: rgba(255,252,232,0.82);
+      font-size: 0.68rem;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow:
+        0 1px 4px rgba(7,16,28,0.64),
+        0 0 10px rgba(255,229,111,0.28),
+        0 0 14px rgba(108,230,255,0.2);
+      box-shadow: none;
+      backdrop-filter: none;
+      transform: translate(-50%, -50%);
+    }
+
+    .result-spark {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 3;
+      width: 0.44rem;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255,243,106,0.95);
+      box-shadow: 0 0 14px rgba(255,243,106,0.86), 0 0 24px rgba(255,255,255,0.52);
+      transform:
+        translate(-50%, -50%)
+        rotate(var(--angle))
+        translateY(calc(min(34vw, 190px) * -1));
+      animation: sparkBlink 1.6s ease-in-out infinite;
+      animation-delay: var(--spark-delay);
+    }
+
+    .app.is-result .cube-scene {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.76);
+    }
+
+    .app.is-result .cube {
+      animation-play-state: paused;
+    }
+
+    .app.is-result .gemini-result {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .app.is-result .result-core::after {
+      animation: mirrorSweep 920ms 180ms ease both;
+    }
+
+    .app.is-result .result-photo {
+      animation: resultPhotoPop 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: var(--pop-delay);
     }
 
     .progress {
@@ -411,12 +1089,14 @@
       border-radius: 999px;
       background: rgba(255,255,255,0.42);
       transition: width 240ms ease, background 240ms ease, box-shadow 240ms ease;
+      animation: dotPulse 3.4s ease-in-out infinite;
     }
 
     .progress span.active {
       width: 1.4rem;
       background: linear-gradient(135deg, var(--pink), var(--cyan));
       box-shadow: 0 0 16px rgba(99,217,246,0.68);
+      animation-duration: 1.5s;
     }
 
     .status {
@@ -449,35 +1129,357 @@
       background: linear-gradient(135deg, var(--pink), var(--cyan));
       box-shadow: 0 0 18px rgba(99,217,246,0.72);
       flex: 0 0 auto;
+      animation: statusPulse 1.8s ease-in-out infinite;
     }
 
     .status strong {
       color: var(--ink);
     }
 
+    .lyrics {
+      position: absolute;
+      left: 50%;
+      bottom: calc(clamp(1rem, 4vw, 2rem) + 4.35rem);
+      z-index: 6;
+      display: grid;
+      gap: 0.18rem;
+      width: min(44rem, calc(100vw - 2rem));
+      padding: 0.86rem 1.2rem;
+      transform: translate(-50%, 12px) scale(0.98);
+      border: 1px solid rgba(255,229,111,0.26);
+      border-radius: 1.15rem;
+      background:
+        linear-gradient(135deg, rgba(255,243,106,0.1), rgba(108,230,255,0.12)),
+        rgba(8,18,37,0.36);
+      box-shadow:
+        0 18px 48px rgba(0,0,0,0.28),
+        0 0 38px rgba(108,230,255,0.11),
+        inset 0 1px 0 rgba(255,255,255,0.22);
+      color: rgba(246,252,255,0.7);
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      overflow: hidden;
+      backdrop-filter: blur(18px) saturate(1.24);
+      transition: opacity 520ms ease, transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lyrics[hidden] {
+      display: none;
+    }
+
+    .lyrics.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .lyrics::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(110deg, transparent 18%, rgba(255,255,255,0.18), transparent 42%);
+      opacity: 0;
+      transform: translateX(-72%);
+    }
+
+    .lyrics.is-changing::before {
+      animation: lyricSweep 680ms ease both;
+    }
+
+    .lyric-line {
+      position: relative;
+      z-index: 1;
+      min-height: 1.25em;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.38;
+      opacity: 0.42;
+      transform: translateY(0) scale(0.98);
+      transition:
+        opacity 420ms ease,
+        transform 520ms cubic-bezier(0.16, 1, 0.3, 1),
+        color 420ms ease,
+        filter 420ms ease;
+    }
+
+    .lyric-line.previous {
+      color: rgba(246,252,255,0.58);
+      font-size: 0.78rem;
+      animation: lyricPrevOut 620ms ease both;
+    }
+
+    .lyric-line.current {
+      color: var(--ink);
+      font-size: clamp(1rem, 2.5vw, 1.34rem);
+      font-weight: 900;
+      opacity: 0.96;
+      text-shadow:
+        0 0 16px rgba(255,229,111,0.26),
+        0 0 22px rgba(108,230,255,0.22);
+      animation: lyricCurrentIn 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .lyric-line.next {
+      color: rgba(246,252,255,0.62);
+      font-size: 0.82rem;
+      animation: lyricNextIn 620ms ease both;
+    }
+
     @keyframes skyShift {
-      from { transform: translate3d(0, 0, 0); }
-      to { transform: translate3d(0.7rem, -0.5rem, 0); }
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(0.9rem, -0.7rem, 0) scale(1.02); }
+    }
+
+    @keyframes twinAura {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(360deg) scale(1.04); }
+    }
+
+    @keyframes hudIntro {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes glyphBreathe {
+      0%, 100% {
+        transform: translateY(0) rotate(-2deg) scale(1);
+        opacity: 0.72;
+      }
+      50% {
+        transform: translateY(8px) rotate(2deg) scale(1.04);
+        opacity: 1;
+      }
+    }
+
+    @keyframes traitDrift {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes orbitSkew {
+      0%, 100% { transform: rotate(-14deg) scale(1); }
+      50% { transform: rotate(-6deg) scale(1.05); }
+    }
+
+    @keyframes mercuryRun {
+      from { transform: rotate(0deg) translateX(8.1rem) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(8.1rem) rotate(-360deg); }
+    }
+
+    @keyframes twinFloatA {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(-30deg); }
+      50% { transform: translate3d(0.55rem, -0.8rem, 0) rotate(30deg); }
+    }
+
+    @keyframes twinFloatB {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(20deg); }
+      50% { transform: translate3d(-0.55rem, 0.7rem, 0) rotate(-8deg); }
+    }
+
+    @keyframes noteFloat {
+      0%, 100% {
+        opacity: 0.76;
+        transform: translate3d(0, 0, 0);
+      }
+      50% {
+        opacity: 1;
+        transform: translate3d(-0.42rem, -0.5rem, 0);
+      }
+    }
+
+    @keyframes twinGate {
+      0%, 100% {
+        transform: translate(-50%, -50%) scaleX(0.96) rotate(0deg);
+        opacity: 0.78;
+      }
+      50% {
+        transform: translate(-50%, -50%) scaleX(1.04) rotate(1deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes mirrorSweep {
+      0% {
+        opacity: 0;
+        transform: translateX(-48%) rotate(10deg);
+      }
+      35% {
+        opacity: 0.95;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(48%) rotate(10deg);
+      }
+    }
+
+    @keyframes faceGlow {
+      0%, 100% {
+        opacity: 0;
+        transform: translateX(-40%) rotate(10deg);
+      }
+      42%, 60% {
+        opacity: 0.34;
+      }
+      100% {
+        transform: translateX(40%) rotate(10deg);
+      }
+    }
+
+    @keyframes activeFaceSweep {
+      0% {
+        opacity: 0;
+        transform: translateX(-48%) rotate(10deg);
+      }
+      38% {
+        opacity: 0.72;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(48%) rotate(10deg);
+      }
+    }
+
+    @keyframes energyRingA {
+      from { transform: rotateX(78deg) rotateZ(16deg); }
+      to { transform: rotateX(78deg) rotateZ(376deg); }
+    }
+
+    @keyframes energyRingB {
+      from { transform: rotateY(76deg) rotateZ(-12deg); }
+      to { transform: rotateY(76deg) rotateZ(348deg); }
+    }
+
+    @keyframes orbitPulse {
+      0%, 100% {
+        opacity: 0.54;
+        filter: brightness(0.9);
+      }
+      50% {
+        opacity: 1;
+        filter: brightness(1.28);
+      }
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.45); }
+    }
+
+    @keyframes lyricSweep {
+      0% { opacity: 0; transform: translateX(-72%); }
+      26% { opacity: 0.68; }
+      100% { opacity: 0; transform: translateX(72%); }
+    }
+
+    @keyframes lyricPrevOut {
+      0% { opacity: 0.5; transform: translateY(0) scale(0.98); filter: blur(0); }
+      100% { opacity: 0.28; transform: translateY(-8px) scale(0.95); filter: blur(0.4px); }
+    }
+
+    @keyframes lyricCurrentIn {
+      0% { opacity: 0; transform: translateY(10px) scale(0.96); filter: blur(1.2px); }
+      100% { opacity: 0.96; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    @keyframes lyricNextIn {
+      0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+      100% { opacity: 0.42; transform: translateY(0) scale(0.98); }
+    }
+
+    @keyframes resultPulse {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(0.96);
+        opacity: 0.82;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.06);
+        opacity: 1;
+      }
+    }
+
+    @keyframes resultHalo {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes twinStarBeat {
+      0%, 100% {
+        transform: scale(0.86);
+        opacity: 0.78;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    @keyframes resultPhotoPop {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes sparkBlink {
+      0%, 100% {
+        opacity: 0.42;
+        transform:
+          translate(-50%, -50%)
+          rotate(var(--angle))
+          translateY(calc(min(34vw, 190px) * -1))
+          scale(0.72);
+      }
+      50% {
+        opacity: 1;
+        transform:
+          translate(-50%, -50%)
+          rotate(var(--angle))
+          translateY(calc(min(34vw, 190px) * -1))
+          scale(1.3);
+      }
     }
 
     @keyframes cardFloat {
-      0%, 100% { transform: translateY(0) rotateX(0deg); }
-      50% { transform: translateY(-10px) rotateX(2deg); }
+      0%, 100% { transform: translateY(0) rotateX(0deg) rotateZ(-0.5deg); }
+      50% { transform: translateY(-13px) rotateX(2.5deg) rotateZ(0.7deg); }
     }
 
     @keyframes cubeSpin {
-      0% { transform: rotateX(-23deg) rotateY(-34deg) scale(1); }
-      16.6% { transform: rotateX(-18deg) rotateY(-96deg) scale(1); }
-      33.3% { transform: rotateX(-22deg) rotateY(-182deg) scale(1); }
-      50% { transform: rotateX(-18deg) rotateY(-276deg) scale(1); }
-      66.6% { transform: rotateX(-84deg) rotateY(-336deg) scale(1); }
-      83.3% { transform: rotateX(72deg) rotateY(-390deg) scale(1); }
-      100% { transform: rotateX(-23deg) rotateY(-394deg) scale(1); }
+      0%, 9% { transform: rotateX(-23deg) rotateY(-34deg) rotateZ(0deg) scale(1); }
+      13% { transform: rotateX(-18deg) rotateY(-106deg) rotateZ(2deg) scale(1.06); }
+      16.6%, 25.6% { transform: rotateX(-19deg) rotateY(-94deg) rotateZ(0.6deg) scale(1.01); }
+      29.6% { transform: rotateX(-24deg) rotateY(-194deg) rotateZ(-2.2deg) scale(1.055); }
+      33.3%, 42.3% { transform: rotateX(-22deg) rotateY(-182deg) rotateZ(-0.8deg) scale(1); }
+      46.3% { transform: rotateX(-16deg) rotateY(-288deg) rotateZ(2.1deg) scale(1.06); }
+      50%, 59% { transform: rotateX(-18deg) rotateY(-276deg) rotateZ(0.7deg) scale(1.015); }
+      63% { transform: rotateX(-92deg) rotateY(-348deg) rotateZ(-1.2deg) scale(1.055); }
+      66.6%, 75.6% { transform: rotateX(-84deg) rotateY(-336deg) rotateZ(-0.5deg) scale(1); }
+      79.6% { transform: rotateX(82deg) rotateY(-402deg) rotateZ(1.4deg) scale(1.055); }
+      83.3%, 92.3% { transform: rotateX(72deg) rotateY(-390deg) rotateZ(0.5deg) scale(1.01); }
+      96.3% { transform: rotateX(-28deg) rotateY(-406deg) rotateZ(-1.2deg) scale(1.055); }
+      100% { transform: rotateX(-23deg) rotateY(-394deg) rotateZ(0deg) scale(1); }
     }
 
     @media (max-width: 720px) {
       :root {
         --cube: min(62vw, 260px);
+        --net: calc(var(--cube) * 0.78);
       }
 
       .app {
@@ -503,40 +1505,184 @@
         width: min(74vw, 310px);
       }
 
+      .gemini-result {
+        --result-card-width: clamp(68px, 20vw, 88px);
+        width: min(92vw, 360px);
+      }
+
+      .result-core {
+        width: 43%;
+      }
+
+      .result-slot {
+        width: var(--result-card-width);
+      }
+
+      .result-photo {
+        border-radius: 0.58rem;
+      }
+
+      .result-photo::after {
+        min-width: 1.82rem;
+        padding: 0.22rem 0.28rem;
+        font-size: 0.58rem;
+      }
+
+      .app::after {
+        inset: 0;
+        transform-origin: center;
+      }
+
+      .stage::before {
+        font-size: min(72vw, 17rem);
+        letter-spacing: -0.18em;
+      }
+
+      .carousel::before {
+        inset: -11%;
+      }
+
+      .carousel::after {
+        inset: -8%;
+      }
+
+      .gemini-orbit {
+        right: 0;
+        bottom: 10rem;
+        /* width: min(9.6rem, 38vw); */
+        width: 100%;
+        padding: 8rem;
+        min-height: 8.2rem;
+        opacity: 0.72;
+        transform: translateX(0);
+      }
+
+      .orbit-ring {
+        inset: 0.7rem 0.2rem 0.3rem;
+      }
+
+      .mercury-dot {
+        animation-name: mercuryRunMobile;
+      }
+
+      .twin-card {
+        width: min(5.8rem, 24vw);
+        padding: 0.54rem 0.58rem;
+        border-radius: 0.95rem;
+      }
+
+      .twin-card strong {
+        font-size: 0.68rem;
+      }
+
+      .twin-card span {
+        font-size: 0.62rem;
+      }
+
+      /* .air-notes {
+        display: none;
+      } */
+
+      .trait-cloud {
+        max-width: 18rem;
+      }
+
+      .trait {
+        min-height: 1.8rem;
+        padding: 0.32rem 0.58rem;
+        font-size: 0.72rem;
+      }
+
       .status {
         font-size: 0.84rem;
       }
+
+      .lyrics {
+        bottom: calc(clamp(1rem, 4vw, 2rem) + 4rem);
+        width: min(92vw, 24rem);
+        padding: 0.68rem 0.78rem;
+        border-radius: 0.92rem;
+      }
+
+      .lyric-line.previous,
+      .lyric-line.next {
+        font-size: 0.66rem;
+      }
+
+      .lyric-line.current {
+        font-size: 0.94rem;
+      }
+    }
+
+    @keyframes mercuryRunMobile {
+      from { transform: rotate(0deg) translateX(4.2rem) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(4.2rem) rotate(-360deg); }
     }
   </style>
 </head>
 <body>
   <main class="app" id="app">
+    <audio id="yairAudio" src="./yair.flac" preload="auto" loop></audio>
     <canvas class="gemini-canvas" id="geminiCanvas" aria-hidden="true"></canvas>
+
+    <header class="hud" aria-label="Yari">
+      <div class="eyebrow">beyond the world / Yair / 2026.05.05</div>
+      <h3>The Album of ZHOUTING</h3>
+      <p class="copy">Meeting beyond the mundane world</p>
+      <div class="trait-cloud" aria-label="key words of gemini">
+        <!-- <span class="trait">Curiosity</span>
+        <span class="trait">Dialogue</span>
+        <span class="trait">Mirror</span>
+        <span class="trait">Air Flow</span>
+        <span class="trait">Mercury</span> -->
+        <span class="trait">2026.05.05</span>
+        <span class="trait">2026.05.11</span>
+      </div>
+    </header>
+
+    <aside class="gemini-orbit" aria-hidden="true">
+      <div class="orbit-ring"></div>
+      <div class="mercury-dot"></div>
+      <div class="twin-card castor">
+        <strong>2026.05.16</strong>
+        <span>喜欢镜头里的每一个瞬间和当时的自己。</span>
+      </div>
+      <div class="twin-card pollux">
+        <strong>long</strong>
+        <span>既知岁月漫长，切勿太早失望。</span>
+      </div>
+    </aside>
+
+    <aside class="air-notes" aria-hidden="true">
+      <span class="air-note">“今天想拍点不一样的。”</span>
+      <span class="air-note">“换个视角，再来一面。”</span>
+      <span class="air-note">“拥有今天就好好感受今天。”</span>
+    </aside>
 
     <section class="stage" aria-label="图片立方体动画">
       <div class="carousel" id="carousel">
         <figure class="slide active">
-          <img src="./001.png" alt="轮播图片 1">
+          <img src="./001.jpg" alt="轮播图片 1">
           <figcaption>Photo 01</figcaption>
         </figure>
         <figure class="slide">
-          <img src="./002.png" alt="轮播图片 2">
+          <img src="./002.jpg" alt="轮播图片 2">
           <figcaption>Photo 02</figcaption>
         </figure>
         <figure class="slide">
-          <img src="./003.png" alt="轮播图片 3">
+          <img src="./003.jpg" alt="轮播图片 3">
           <figcaption>Photo 03</figcaption>
         </figure>
         <figure class="slide">
-          <img src="./004.png" alt="轮播图片 4">
+          <img src="./004.jpg" alt="轮播图片 4">
           <figcaption>Photo 04</figcaption>
         </figure>
         <figure class="slide">
-          <img src="./005.png" alt="轮播图片 5">
+          <img src="./005.jpg" alt="轮播图片 5">
           <figcaption>Photo 05</figcaption>
         </figure>
         <figure class="slide">
-          <img src="./006.png" alt="轮播图片 6">
+          <img src="./006.jpg" alt="轮播图片 6">
           <figcaption>Photo 06</figcaption>
         </figure>
       </div>
@@ -544,45 +1690,100 @@
       <div class="cube-scene" aria-label="六面图片正方体">
         <div class="cube" id="cube">
           <figure class="face front">
-            <img src="./001.png" alt="立方体正面">
+            <img src="./001.jpg" alt="立方体正面">
             <figcaption>Face 01</figcaption>
           </figure>
           <figure class="face right">
-            <img src="./002.png" alt="立方体右面">
+            <img src="./002.jpg" alt="立方体右面">
             <figcaption>Face 02</figcaption>
           </figure>
           <figure class="face back">
-            <img src="./003.png" alt="立方体背面">
+            <img src="./003.jpg" alt="立方体背面">
             <figcaption>Face 03</figcaption>
           </figure>
           <figure class="face left">
-            <img src="./004.png" alt="立方体左面">
+            <img src="./004.jpg" alt="立方体左面">
             <figcaption>Face 04</figcaption>
           </figure>
           <figure class="face top">
-            <img src="./005.png" alt="立方体顶面">
+            <img src="./005.jpg" alt="立方体顶面">
             <figcaption>Face 05</figcaption>
           </figure>
           <figure class="face bottom">
-            <img src="./006.png" alt="立方体底面">
+            <img src="./006.jpg" alt="立方体底面">
             <figcaption>Face 06</figcaption>
           </figure>
         </div>
       </div>
+      <div class="gemini-result" id="geminiResult" aria-label="合成后的双子星">
+        <div class="result-core">
+          <span class="twin-stars" aria-hidden="true">
+            <i></i>
+            <i></i>
+          </span>
+          <strong class="result-title">
+            <span>2026/05.05</span>
+          </strong>
+          <span class="result-subtitle">METTING</span>
+        </div>
+        <div class="result-orbit" aria-hidden="true">
+          <div class="result-slot" style="--phase: 0;">
+            <figure class="result-photo" style="--axis-yaw: 18deg; --pop-delay: 0ms;">
+              <img src="./001.jpg" alt="">
+            </figure>
+          </div>
+          <div class="result-slot" style="--phase: 60;">
+            <figure class="result-photo" style="--axis-yaw: 18deg; --pop-delay: 70ms;">
+              <img src="./002.jpg" alt="">
+            </figure>
+          </div>
+          <div class="result-slot" style="--phase: 120;">
+            <figure class="result-photo" style="--axis-yaw: 18deg; --pop-delay: 140ms;">
+              <img src="./003.jpg" alt="">
+            </figure>
+          </div>
+          <div class="result-slot" style="--phase: 180;">
+            <figure class="result-photo" style="--axis-yaw: 18deg; --pop-delay: 210ms;">
+              <img src="./004.jpg" alt="">
+            </figure>
+          </div>
+          <div class="result-slot" style="--phase: 240;">
+            <figure class="result-photo" style="--axis-yaw: 18deg; --pop-delay: 280ms;">
+              <img src="./005.jpg" alt="">
+            </figure>
+          </div>
+          <div class="result-slot" style="--phase: 300;">
+            <figure class="result-photo" style="--axis-yaw: 18deg; --pop-delay: 350ms;">
+              <img src="./006.jpg" alt="">
+            </figure>
+          </div>
+        </div>
+        <i class="result-spark" style="--angle: 26deg; --spark-delay: 0s;" aria-hidden="true"></i>
+        <i class="result-spark" style="--angle: 92deg; --spark-delay: -0.4s;" aria-hidden="true"></i>
+        <i class="result-spark" style="--angle: 157deg; --spark-delay: -0.8s;" aria-hidden="true"></i>
+        <i class="result-spark" style="--angle: 222deg; --spark-delay: -1.1s;" aria-hidden="true"></i>
+        <i class="result-spark" style="--angle: 286deg; --spark-delay: -0.2s;" aria-hidden="true"></i>
+      </div>
     </section>
 
-    <div class="progress" id="progress" aria-hidden="true">
+    <!-- <div class="progress" id="progress" aria-hidden="true">
       <span class="active"></span>
       <span></span>
       <span></span>
       <span></span>
       <span></span>
       <span></span>
-    </div>
+    </div> -->
 
     <div class="status">
       <i aria-hidden="true"></i>
-      <span><span id="phase">图片轮播</span> <strong id="current">Photo 01</strong></span>
+      <span><span id="phase">Yair Photo</span> <strong id="current">Curiosity</strong></span>
+    </div>
+
+    <div class="lyrics" id="lyrics" aria-live="polite" aria-label="歌词" hidden>
+      <p class="lyric-line previous" id="lyricPrev"></p>
+      <p class="lyric-line current" id="lyricCurrent">歌词准备中</p>
+      <p class="lyric-line next" id="lyricNext"></p>
     </div>
   </main>
 
@@ -591,23 +1792,56 @@
     const bgCanvas = document.getElementById("geminiCanvas");
     const bgCtx = bgCanvas.getContext("2d");
     const slides = Array.from(document.querySelectorAll(".slide"));
+    const cubeScene = document.querySelector(".cube-scene");
+    const faces = Array.from(document.querySelectorAll(".face"));
+    const resultSlots = Array.from(document.querySelectorAll(".result-slot"));
+    const resultPhotos = Array.from(document.querySelectorAll(".result-photo"));
     const dots = Array.from(document.querySelectorAll("#progress span"));
+    const yairAudio = document.getElementById("yairAudio");
     const phase = document.getElementById("phase");
     const current = document.getElementById("current");
-    const slideDuration = 980;
-    const spinFaces = ["Face 01", "Face 02", "Face 03", "Face 04", "Face 05", "Face 06"];
+    const lyrics = document.getElementById("lyrics");
+    const lyricPrev = document.getElementById("lyricPrev");
+    const lyricCurrent = document.getElementById("lyricCurrent");
+    const lyricNext = document.getElementById("lyricNext");
+    const slideDuration = 1120;
+    const geminiThemes = ["Curiosity", "Dialogue", "Mirror", "Air Flow", "Mercury", "Twin Spark"];
+    const geminiNotes = ["Amoy", "说给风听", "Amoy", "轻快转场", "Amoy", "灵感闪烁"];
     let currentSlide = 0;
     let bgWidth = 0;
     let bgHeight = 0;
     let bgDpr = 1;
     let bgTime = 0;
+    let resultStarted = false;
+    let resultTime = 0;
     const stars = [];
     const dust = [];
     const ribbons = [];
     const bursts = [];
+    const chatBubbles = [];
+    const comets = [];
+    let audioStarted = false;
+    let lyricEntries = [];
+    let activeLyricIndex = -1;
 
     function rand(min, max) {
       return Math.random() * (max - min) + min;
+    }
+
+    function clamp01(value) {
+      return Math.max(0, Math.min(1, value));
+    }
+
+    function easeOutBack(value) {
+      const t = clamp01(value);
+      const c1 = 1.32;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    }
+
+    function easeInOutCubic(value) {
+      const t = clamp01(value);
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
     function resizeBackground() {
@@ -626,10 +1860,14 @@
       stars.length = 0;
       dust.length = 0;
       ribbons.length = 0;
+      chatBubbles.length = 0;
+      comets.length = 0;
 
       const starCount = Math.floor((bgWidth * bgHeight) / 6500);
       const dustCount = Math.floor((bgWidth * bgHeight) / 9000);
-      const ribbonCount = Math.max(5, Math.floor(bgWidth / 300));
+      const ribbonCount = Math.max(6, Math.floor(bgWidth / 280));
+      const bubbleCount = bgWidth < 720 ? 4 : 7;
+      const cometCount = bgWidth < 720 ? 3 : 5;
 
       for (let i = 0; i < starCount; i += 1) {
         stars.push({
@@ -637,7 +1875,8 @@
           y: rand(0, bgHeight),
           r: rand(0.6, 2.2),
           twinkle: rand(0.3, 1.4),
-          phase: rand(0, Math.PI * 2)
+          phase: rand(0, Math.PI * 2),
+          drift: rand(0.05, 0.28)
         });
       }
 
@@ -656,9 +1895,32 @@
         ribbons.push({
           y: rand(bgHeight * 0.18, bgHeight * 0.86),
           amp: rand(16, 42),
-          speed: rand(0.2, 0.75),
+          speed: rand(0.26, 0.86),
           thick: rand(1.2, 3.8),
-          hue: rand(180, 300),
+          hue: rand(55, 190),
+          phase: rand(0, Math.PI * 2)
+        });
+      }
+
+      for (let i = 0; i < bubbleCount; i += 1) {
+        chatBubbles.push({
+          x: rand(bgWidth * 0.08, bgWidth * 0.92),
+          y: rand(bgHeight * 0.16, bgHeight * 0.86),
+          w: rand(46, 96),
+          h: rand(22, 38),
+          speed: rand(0.12, 0.38),
+          phase: rand(0, Math.PI * 2),
+          hue: rand(58, 190)
+        });
+      }
+
+      for (let i = 0; i < cometCount; i += 1) {
+        comets.push({
+          x: rand(-bgWidth * 0.4, bgWidth),
+          y: rand(bgHeight * 0.08, bgHeight * 0.72),
+          speed: rand(0.9, 1.9),
+          length: rand(70, 150),
+          hue: i % 2 === 0 ? rand(50, 70) : rand(170, 195),
           phase: rand(0, Math.PI * 2)
         });
       }
@@ -668,8 +1930,10 @@
       bgTime += 0.016;
       bgCtx.clearRect(0, 0, bgWidth, bgHeight);
       drawHappyDayWash();
+      drawComets(bgTime);
       drawStars(bgTime);
       drawRibbons(bgTime);
+      drawChatBubbles(bgTime);
       drawDust();
       drawGeminiCore(bgTime);
       drawGeminiSymbol(bgTime);
@@ -689,11 +1953,38 @@
     function drawStars(now) {
       for (const star of stars) {
         const glow = 0.4 + 0.6 * Math.sin(now * star.twinkle + star.phase);
+        star.x += star.drift * 0.08;
+        if (star.x > bgWidth + 4) star.x = -4;
         bgCtx.beginPath();
         bgCtx.fillStyle = `rgba(255,255,255,${0.22 + glow * 0.7})`;
         bgCtx.arc(star.x, star.y, star.r + glow * 0.8, 0, Math.PI * 2);
         bgCtx.fill();
       }
+    }
+
+    function drawComets(now) {
+      for (const comet of comets) {
+        comet.x += comet.speed;
+        comet.y += Math.sin(now * 0.8 + comet.phase) * 0.18;
+        if (comet.x - comet.length > bgWidth + 20) {
+          comet.x = rand(-bgWidth * 0.45, -80);
+          comet.y = rand(bgHeight * 0.08, bgHeight * 0.72);
+        }
+
+        const gradient = bgCtx.createLinearGradient(comet.x - comet.length, comet.y - 16, comet.x, comet.y);
+        gradient.addColorStop(0, `hsla(${comet.hue},95%,72%,0)`);
+        gradient.addColorStop(0.7, `hsla(${comet.hue},95%,72%,0.22)`);
+        gradient.addColorStop(1, `hsla(${comet.hue},95%,82%,0.78)`);
+        bgCtx.beginPath();
+        bgCtx.strokeStyle = gradient;
+        bgCtx.lineWidth = 2;
+        bgCtx.shadowColor = `hsla(${comet.hue},95%,72%,0.48)`;
+        bgCtx.shadowBlur = 16;
+        bgCtx.moveTo(comet.x - comet.length, comet.y - 16);
+        bgCtx.lineTo(comet.x, comet.y);
+        bgCtx.stroke();
+      }
+      bgCtx.shadowBlur = 0;
     }
 
     function drawRibbons(now) {
@@ -715,6 +2006,54 @@
         bgCtx.stroke();
       }
       bgCtx.shadowBlur = 0;
+    }
+
+    function drawChatBubbles(now) {
+      for (const bubble of chatBubbles) {
+        const floatX = Math.sin(now * bubble.speed + bubble.phase) * 13;
+        const floatY = Math.cos(now * bubble.speed * 1.4 + bubble.phase) * 9;
+        const x = bubble.x + floatX;
+        const y = bubble.y + floatY;
+        const alpha = 0.16 + Math.sin(now * bubble.speed * 2 + bubble.phase) * 0.05;
+
+        bgCtx.save();
+        bgCtx.translate(x, y);
+        bgCtx.beginPath();
+        roundedRect(bgCtx, -bubble.w / 2, -bubble.h / 2, bubble.w, bubble.h, 12);
+        bgCtx.fillStyle = `hsla(${bubble.hue},90%,76%,${alpha})`;
+        bgCtx.shadowColor = `hsla(${bubble.hue},90%,76%,0.26)`;
+        bgCtx.shadowBlur = 18;
+        bgCtx.fill();
+        bgCtx.beginPath();
+        bgCtx.moveTo(bubble.w * 0.18, bubble.h * 0.42);
+        bgCtx.lineTo(bubble.w * 0.32, bubble.h * 0.66);
+        bgCtx.lineTo(bubble.w * 0.07, bubble.h * 0.48);
+        bgCtx.closePath();
+        bgCtx.fill();
+
+        bgCtx.shadowBlur = 0;
+        bgCtx.fillStyle = `rgba(255,255,255,${0.34 + alpha})`;
+        for (let i = -1; i <= 1; i += 1) {
+          bgCtx.beginPath();
+          bgCtx.arc(i * 10, 0, 2, 0, Math.PI * 2);
+          bgCtx.fill();
+        }
+        bgCtx.restore();
+      }
+    }
+
+    function roundedRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
     }
 
     function drawDust() {
@@ -745,8 +2084,8 @@
 
       const beam = bgCtx.createLinearGradient(ax, ay, bx, by);
       beam.addColorStop(0, "rgba(131,243,255,0.88)");
-      beam.addColorStop(0.5, "rgba(255,255,255,0.78)");
-      beam.addColorStop(1, "rgba(255,137,215,0.88)");
+      beam.addColorStop(0.5, "rgba(255,243,106,0.78)");
+      beam.addColorStop(1, "rgba(140,255,182,0.88)");
       bgCtx.strokeStyle = beam;
       bgCtx.lineWidth = Math.max(2, Math.min(bgWidth, bgHeight) * 0.0045);
       bgCtx.shadowColor = "rgba(170,220,255,0.75)";
@@ -758,9 +2097,34 @@
 
       const pulse = 11 + Math.sin(now * 2.7) * 3;
       drawNeonPlanet(ax, ay, pulse, "rgba(131,243,255,0.78)");
-      drawNeonPlanet(bx, by, pulse, "rgba(255,137,215,0.78)");
+      drawNeonPlanet(bx, by, pulse, "rgba(140,255,182,0.78)");
+      drawMercuryOrbit(cx, cy, orbit * 1.55, now);
       drawConstellation(ax, ay, bx, by, now);
       bgCtx.shadowBlur = 0;
+    }
+
+    function drawMercuryOrbit(cx, cy, radius, now) {
+      bgCtx.save();
+      bgCtx.translate(cx, cy);
+      bgCtx.rotate(-0.28);
+      bgCtx.scale(1, 0.42);
+      bgCtx.beginPath();
+      bgCtx.strokeStyle = "rgba(255,229,111,0.26)";
+      bgCtx.lineWidth = 1.3;
+      bgCtx.setLineDash([6, 12]);
+      bgCtx.arc(0, 0, radius, 0, Math.PI * 2);
+      bgCtx.stroke();
+      bgCtx.setLineDash([]);
+
+      const dotX = Math.cos(now * 1.8) * radius;
+      const dotY = Math.sin(now * 1.8) * radius;
+      bgCtx.beginPath();
+      bgCtx.fillStyle = "rgba(255,229,111,0.92)";
+      bgCtx.shadowColor = "rgba(255,229,111,0.72)";
+      bgCtx.shadowBlur = 18;
+      bgCtx.arc(dotX, dotY, 4.2, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.restore();
     }
 
     function drawNeonPlanet(x, y, radius, color) {
@@ -819,9 +2183,9 @@
 
       bgCtx.save();
       bgCtx.translate(x, y + sway);
-      bgCtx.strokeStyle = "rgba(255,214,127,0.82)";
+      bgCtx.strokeStyle = "rgba(255,229,111,0.86)";
       bgCtx.lineWidth = Math.max(2, size * 0.12);
-      bgCtx.shadowColor = "rgba(255,214,127,0.62)";
+      bgCtx.shadowColor = "rgba(255,229,111,0.62)";
       bgCtx.shadowBlur = 16;
       bgCtx.lineCap = "round";
       bgCtx.beginPath();
@@ -850,7 +2214,7 @@
           vy: Math.sin(angle) * speed,
           life,
           maxLife: life,
-          hue: rand(180, 340),
+          hue: Math.random() > 0.46 ? rand(50, 75) : rand(165, 195),
           r: rand(1.2, 3.2)
         });
       }
@@ -888,10 +2252,11 @@
       slides.forEach((slide, slideIndex) => {
         slide.classList.toggle("active", slideIndex === index);
         slide.classList.toggle("previous", slideIndex === index - 1);
+        slide.classList.toggle("next", slideIndex === index + 1);
       });
 
-      phase.textContent = "图片轮播";
-      current.textContent = "Photo " + String(index + 1).padStart(2, "0");
+      phase.textContent = "YAIR";
+      current.textContent = geminiThemes[index] + " / " + geminiNotes[index];
       setProgress(index);
     }
 
@@ -909,8 +2274,8 @@
 
     function startAssembling() {
       app.classList.add("is-assembling");
-      phase.textContent = "正在拼成立方体";
-      current.textContent = "六面合成";
+      phase.textContent = "双生画面展开";
+      current.textContent = "六面正在对话";
       dots.forEach((dot) => dot.classList.add("active"));
 
       window.setTimeout(() => {
@@ -923,25 +2288,262 @@
     function startSpinning() {
       let faceIndex = 0;
       app.classList.add("is-spinning");
-      phase.textContent = "立方体旋转";
+      phase.textContent = "水星轨道旋转";
 
       function updateFace() {
-        current.textContent = spinFaces[faceIndex];
+        if (faceIndex >= faces.length) {
+          window.setTimeout(showGeminiResult, 520);
+          return;
+        }
+
+        faces.forEach((face, index) => {
+          face.classList.toggle("is-current", index === faceIndex);
+        });
+        current.textContent = geminiThemes[faceIndex];
         setProgress(faceIndex);
-        faceIndex = (faceIndex + 1) % spinFaces.length;
+        spawnBurst(bgWidth * 0.5, bgHeight * 0.52, 0.72);
+        faceIndex += 1;
+        window.setTimeout(updateFace, 3000);
       }
 
       updateFace();
-      window.setInterval(updateFace, 4000);
+    }
+
+    function renderResultCarousel() {
+      if (!resultStarted) return;
+
+      resultTime += 0.016;
+      const isMobile = bgWidth < 720;
+      const maxRadius = Math.min(bgWidth * (isMobile ? 0.36 : 0.26), isMobile ? 150 : 220);
+      const cardDuration = 1.28;
+      const cycle = cardDuration * resultSlots.length;
+      const cyclePosition = resultTime % cycle;
+      const activeIndex = Math.floor(cyclePosition / cardDuration);
+      const activeProgress = (cyclePosition - activeIndex * cardDuration) / cardDuration;
+      const activeOutward = activeProgress < 0.5
+        ? easeInOutCubic(activeProgress * 2)
+        : easeInOutCubic((1 - activeProgress) * 2);
+      const spin = resultTime * 0.58;
+      setProgress(activeIndex);
+      current.textContent = `${geminiThemes[activeIndex]} / 3D 合成轮转`;
+
+      resultSlots.forEach((slot, index) => {
+        const baseAngle = (index / resultSlots.length) * Math.PI * 2 - Math.PI / 2;
+        const isActive = index === activeIndex;
+        const idle = isActive ? 0 : 0.12;
+        const outward = isActive ? activeOutward : idle;
+        const radius = maxRadius * outward;
+        const depthBoost = 84 * outward;
+        const angle = baseAngle + spin + activeOutward * Math.PI * 0.58;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * (radius + depthBoost);
+        const y = Math.sin(angle * 2 + index * 0.35) * 12 * outward;
+        const front = (Math.cos(angle) + 1) / 2;
+        const scale = isActive
+          ? 0.7 + outward * 0.34 + front * 0.14
+          : 0.36 + front * 0.06;
+        const brightness = isActive
+          ? 0.78 + outward * 0.28 + front * 0.2
+          : 0.44 + front * 0.08;
+        const opacity = isActive
+          ? clamp01(0.62 + outward * 0.42)
+          : 0.2;
+
+        slot.style.zIndex = String(isActive ? 180 + Math.round(front * 60) : 70 + index);
+        slot.style.opacity = opacity.toFixed(3);
+        slot.style.filter = `brightness(${brightness.toFixed(3)}) saturate(${(0.88 + outward * 0.34).toFixed(3)})`;
+        const orbitYaw = -angle * 180 / Math.PI;
+        slot.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) rotateY(${orbitYaw.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+      });
+
+      requestAnimationFrame(renderResultCarousel);
+    }
+
+    function renderAccumulatingResultCarousel() {
+      if (!resultStarted) return;
+
+      resultTime += 0.016;
+      const isMobile = bgWidth < 720;
+      const maxRadius = Math.min(bgWidth * (isMobile ? 0.36 : 0.26), isMobile ? 150 : 220);
+      const joinDuration = 0.86;
+      const joinGap = 0.42;
+      const buildDuration = joinGap * (resultSlots.length - 1) + joinDuration;
+      const rotateDuration = 30;
+      const rotateTurns = 3;
+      const loopDuration = buildDuration + rotateDuration;
+      const loopTime = resultTime % loopDuration;
+      const assembled = loopTime >= buildDuration;
+      const joinedCount = assembled
+        ? resultSlots.length
+        : Math.max(1, Math.min(resultSlots.length, Math.floor(loopTime / joinGap) + 1));
+      const rotateTime = Math.max(0, loopTime - buildDuration);
+      const spin = assembled
+        ? (rotateTime / rotateDuration) * Math.PI * 2 * rotateTurns
+        : loopTime * 0.28;
+      const progressIndex = assembled ? resultSlots.length - 1 : joinedCount - 1;
+      setProgress(progressIndex);
+      current.textContent = assembled ? "六张图片整体 3D 旋转" : `${geminiThemes[progressIndex]} 加入合成`;
+
+      resultSlots.forEach((slot, index) => {
+        const baseAngle = (index / resultSlots.length) * Math.PI * 2 - Math.PI / 2;
+        const joinStart = index * joinGap;
+        const rawJoin = (loopTime - joinStart) / joinDuration;
+        const joining = rawJoin > 0 && rawJoin < 1;
+        const joined = assembled || rawJoin >= 1;
+        const joinProgress = joined ? 1 : joining ? easeOutBack(rawJoin) : 0;
+        const progress = clamp01(joinProgress);
+        const settle = clamp01((loopTime - buildDuration) / 0.9);
+        const angle = baseAngle + spin + (1 - progress) * Math.PI * 0.9;
+        const radius = maxRadius * progress;
+        const depthBoost = 76 * progress;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * (radius + depthBoost);
+        const y = Math.sin(angle * 2 + index * 0.35) * 9 * progress;
+        const front = (Math.cos(angle) + 1) / 2;
+        const scale = (0.58 + progress * 0.36 + front * 0.12) * (1 + settle * 0.025 * Math.sin(resultTime + index));
+        const brightness = 0.54 + progress * 0.34 + front * 0.22;
+        const opacity = progress > 0 ? clamp01(0.18 + progress * 0.86) : 0;
+        const axisYaw = 12 + front * 14;
+
+        slot.style.zIndex = String(90 + Math.round(front * 90 + progress * 50));
+        slot.style.opacity = opacity.toFixed(3);
+        slot.style.filter = `brightness(${brightness.toFixed(3)}) saturate(${(0.82 + progress * 0.38).toFixed(3)})`;
+        const orbitYaw = -angle * 180 / Math.PI;
+        slot.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) rotateY(${orbitYaw.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+        resultPhotos[index].style.setProperty("--axis-yaw", `${axisYaw.toFixed(2)}deg`);
+      });
+
+      requestAnimationFrame(renderAccumulatingResultCarousel);
+    }
+
+    function startResultCarousel() {
+      if (resultStarted) return;
+      resultStarted = true;
+      resultTime = 0;
+      requestAnimationFrame(renderAccumulatingResultCarousel);
+    }
+
+    function showGeminiResult() {
+      app.classList.add("is-result");
+      faces.forEach((face) => face.classList.remove("is-current"));
+      dots.forEach((dot) => dot.classList.add("active"));
+      startResultCarousel();
+      phase.textContent = "YAiR PHOTOS";
+      // current.textContent = "六张图片 3D 环绕合成";
+      spawnBurst(bgWidth * 0.5, bgHeight * 0.5, 1.8);
+      window.setTimeout(() => {
+        spawnBurst(bgWidth * 0.5, bgHeight * 0.5, 1.2);
+      }, 260);
     }
 
     function pointerBurst(event) {
       spawnBurst(event.clientX, event.clientY, 1 + Math.random() * 0.65);
     }
 
+    function parseLrc(text) {
+      return text
+        .split(/\r?\n/)
+        .flatMap((line) => {
+          const matches = Array.from(line.matchAll(/\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g));
+          const lyricText = line.replace(/\[[^\]]+\]/g, "").trim();
+          if (!matches.length || !lyricText) return [];
+
+          return matches.map((match) => {
+            const minutes = Number(match[1]);
+            const seconds = Number(match[2]);
+            const fraction = Number((match[3] || "0").padEnd(3, "0"));
+            return {
+              time: minutes * 60 + seconds + fraction / 1000,
+              text: lyricText
+            };
+          });
+        })
+        .sort((a, b) => a.time - b.time);
+    }
+
+    function setLyric(index) {
+      if (!lyrics || !lyricCurrent || index === activeLyricIndex) return;
+      activeLyricIndex = index;
+      const previousLine = lyricEntries[index - 1];
+      const currentLine = lyricEntries[index];
+      const nextLine = lyricEntries[index + 1];
+
+      lyrics.classList.remove("is-changing");
+      void lyrics.offsetWidth;
+      lyrics.classList.add("is-changing");
+      lyricPrev.textContent = previousLine ? previousLine.text : "";
+      lyricCurrent.textContent = currentLine ? currentLine.text : "";
+      lyricNext.textContent = nextLine ? nextLine.text : "";
+    }
+
+    function updateLyrics() {
+      if (!yairAudio || !lyricEntries.length) return;
+      const currentTime = yairAudio.currentTime || 0;
+      let nextIndex = -1;
+
+      for (let index = lyricEntries.length - 1; index >= 0; index -= 1) {
+        if (currentTime >= lyricEntries[index].time) {
+          nextIndex = index;
+          break;
+        }
+      }
+
+      if (nextIndex >= 0) {
+        setLyric(nextIndex);
+      }
+    }
+
+    function loadLyrics() {
+      return fetch("./yair.lrc")
+        .then((response) => {
+          if (!response.ok) throw new Error("No lyric file");
+          return response.text();
+        })
+        .then((text) => {
+          lyricEntries = parseLrc(text);
+          activeLyricIndex = -1;
+          if (lyricEntries.length && lyricCurrent) {
+            lyricCurrent.textContent = lyricEntries[0].text;
+            lyricNext.textContent = lyricEntries[1] ? lyricEntries[1].text : "";
+          }
+        })
+        .catch(() => {
+          if (lyrics) lyrics.hidden = true;
+        });
+    }
+
+    function startAudio() {
+      if (audioStarted || !yairAudio) return;
+      yairAudio.volume = 0.72;
+      const playPromise = yairAudio.play();
+
+      if (!playPromise) {
+        audioStarted = true;
+        return;
+      }
+
+      playPromise
+        .then(() => {
+          audioStarted = true;
+          if (lyrics && lyricEntries.length) {
+            lyrics.hidden = false;
+            lyrics.classList.add("is-visible");
+            updateLyrics();
+          }
+          window.removeEventListener("click", startAudio);
+          window.removeEventListener("pointerdown", startAudio);
+          window.removeEventListener("keydown", startAudio);
+        })
+        .catch(() => {
+          audioStarted = false;
+        });
+    }
+
     window.addEventListener("load", () => {
       resizeBackground();
       requestAnimationFrame(drawGeminiBackground);
+      loadLyrics();
+      startAudio();
       window.setTimeout(playCarousel, 280);
       window.setTimeout(() => {
         spawnBurst(bgWidth * 0.35, bgHeight * 0.62, 1.35);
@@ -953,6 +2555,18 @@
     });
 
     window.addEventListener("resize", resizeBackground);
+    window.addEventListener("click", startAudio);
+    window.addEventListener("pointerdown", startAudio);
+    window.addEventListener("keydown", startAudio);
+    yairAudio.addEventListener("play", () => {
+      if (lyrics && lyricEntries.length) {
+        lyrics.hidden = false;
+        lyrics.classList.add("is-visible");
+        updateLyrics();
+      }
+    });
+    yairAudio.addEventListener("timeupdate", updateLyrics);
+    yairAudio.addEventListener("seeked", updateLyrics);
     window.addEventListener("click", pointerBurst);
     window.addEventListener("pointermove", (event) => {
       if (event.buttons > 0) {
