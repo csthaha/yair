@@ -1871,7 +1871,7 @@
     const lyricNext = document.getElementById("lyricNext");
     const slideDuration = 1120;
     const geminiThemes = ["Curiosity", "Dialogue", "Mirror", "Air Flow", "Mercury", "Twin Spark"];
-    const geminiNotes = ["Amoy", "说给风听", "Amoy", "轻快转场", "Amoy", "灵感闪烁"];
+    const geminiNotes = ["Amoy", "Wind", "Amoy", "Brisk", "Amoy", "Inspriiration"];
     let currentSlide = 0;
     let bgWidth = 0;
     let bgHeight = 0;
@@ -2339,8 +2339,8 @@
 
     function startAssembling() {
       app.classList.add("is-assembling");
-      phase.textContent = "双生画面展开";
-      current.textContent = "六面正在对话";
+      phase.textContent = "Twin scenes";
+      current.textContent = "Dialogue";
       dots.forEach((dot) => dot.classList.add("active"));
 
       window.setTimeout(() => {
@@ -2353,7 +2353,7 @@
     function startSpinning() {
       let faceIndex = 0;
       app.classList.add("is-spinning");
-      phase.textContent = "水星轨道旋转";
+      phase.textContent = "Mercury";
 
       function updateFace() {
         if (faceIndex >= faces.length) {
@@ -2390,7 +2390,7 @@
         : easeInOutCubic((1 - activeProgress) * 2);
       const spin = resultTime * 0.58;
       setProgress(activeIndex);
-      current.textContent = `${geminiThemes[activeIndex]} / 3D 合成轮转`;
+      current.textContent = `${geminiThemes[activeIndex]} / 3D`;
 
       resultSlots.forEach((slot, index) => {
         const baseAngle = (index / resultSlots.length) * Math.PI * 2 - Math.PI / 2;
