@@ -301,6 +301,17 @@
       animation: twinFloatB 5.4s 0.3s ease-in-out infinite;
     }
 
+    .twin-card.family {
+      left: 4rem;
+      bottom: 0.6rem;
+      animation: twinFloatC 5.4s ease-in-out infinite;
+    }
+
+    .twin-card.family {
+      bottom: -2rem;
+      left: 10rem;
+    }
+
     .twin-card.pollux::before {
       background: var(--leaf);
       box-shadow: 0 0 18px rgba(140,255,182,0.72);
@@ -1313,6 +1324,11 @@
       50% { transform: translate3d(-0.55rem, 0.7rem, 0) rotate(-8deg); }
     }
 
+    @keyframes twinFloatC {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(-38deg); }
+      50% { transform: translate3d(-0.55rem, 0.7rem, 0) rotate(38deg); }
+    }
+
     @keyframes noteFloat {
       0%, 100% {
         opacity: 0.76;
@@ -1720,6 +1736,10 @@
       <div class="twin-card pollux">
         <strong>long</strong>
         <span>既知岁月漫长，切勿太早失望。</span>
+      </div>
+      <div class="twin-card family">
+        <strong>day_lunar</strong>
+        <span>m: 05.21; f: 07.01; b: 04.07</span>
       </div>
     </aside>
 
